@@ -1,9 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: [
-    "@nuxt/eslint",
-    "@nuxt/ui-pro",
-  ],
+  modules: ["@nuxt/eslint", "@nuxt/ui-pro", "nuxt-edgedb-module"],
 
   devtools: {
     enabled: true,
@@ -21,6 +18,15 @@ export default defineNuxtConfig({
   },
 
   compatibilityDate: "2024-07-11",
+
+  edgeDb: {
+    devtools: true,
+    dbschemaDir: "server/dbschema",
+    queriesDir: "server/queries",
+    installCli: true,
+    composables: true,
+    auth: true,
+  },
 
   eslint: {
     config: {
