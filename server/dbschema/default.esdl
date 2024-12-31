@@ -37,6 +37,7 @@ module default {
     required status: VersionStatus {
       default := <VersionStatus>'Draft';
     }
+      verified_by: User;
     change_requests := .<version_with_status[is ChangeRequest];
   }
 
@@ -151,7 +152,6 @@ module default {
 
   type PlaceVersion extending HasLocalizedTitle, HasDescriptionAndSource, HasLocation, HasStatus, HasCreator, HasTimestamps {
     required place: Place;
-    verified_by: User;
 
     access policy admin_has_full_access
       allow all
@@ -246,8 +246,6 @@ module default {
   type MediaVersion extending HasLocalizedTitle, HasDescriptionAndSource, HasStatus, HasCreator, HasTimestamps {
     required media: Media;
     file: MediaFile;
-
-    verified_by: User;
 
     access policy admin_has_full_access
       allow all
