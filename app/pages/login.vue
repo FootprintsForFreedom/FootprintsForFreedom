@@ -51,51 +51,53 @@ async function onSubmit(
 </script>
 
 <template>
-  <div class="login">
-    <EdgeDbAuthEmailLogin
-      :ref="loginForm"
-      v-slot="{ updateEmail, updatePassword, submit, loading }"
-      redirect-to="/"
-    >
-      <UCard class="max-w-sm w-full bg-white/75 dark:bg-gray-950/50 backdrop-blur">
-        <template #header>
-          <h2>Login</h2>
-        </template>
+  <EdgeDbAuthEmailLogin
+    :ref="loginForm"
+    v-slot="{ updateEmail, updatePassword, submit, loading }"
+    redirect-to="/"
+  >
+    <UCard class="max-w-sm w-full bg-white/75 dark:bg-gray-950/50 backdrop-blur">
+      <template #header>
+        <h2>Login</h2>
+      </template>
 
-        <UForm
-          :schema="v.safeParser(schema)"
-          :state="state"
-          class="space-y-4"
-          @submit="onSubmit($event, updateEmail, updatePassword, submit)"
+      <UForm
+        :schema="v.safeParser(schema)"
+        :state="state"
+        class="space-y-4"
+        @submit="onSubmit($event, updateEmail, updatePassword, submit)"
+      >
+        <UFormField
+          label="E-Mail"
+          name="email"
         >
-          <UFormField
-            label="E-Mail"
-            name="email"
-          >
-            <UInput
-              v-model="state.email"
-            />
-          </UFormField>
-          <UFormField
-            label="Password"
-            name="password"
-          >
-            <UInput
-              v-model="state.password"
-              type="password"
-            />
-          </UFormField>
+          <UInput
+            v-model="state.email"
+            class="max-w-sm w-full"
+          />
+        </UFormField>
+        <UFormField
+          label="Password"
+          name="password"
+        >
+          <UInput
+            v-model="state.password"
+            type="password"
+            class="max-w-sm w-full"
+          />
+        </UFormField>
 
-          <UButton
-            type="submit"
-            :loading="loading"
-          >
-            Login
-          </UButton>
+        <UButton
+          type="submit"
+          :loading="loading"
+          class="max-w-sm w-full"
+          block
+        >
+          Login
+        </UButton>
 
-          <OAuthProviders />
-        </UForm>
-      </UCard>
-    </EdgeDbAuthEmailLogin>
-  </div>
+        <OAuthProviders />
+      </UForm>
+    </UCard>
+  </EdgeDbAuthEmailLogin>
 </template>
