@@ -8,6 +8,12 @@ export default defineNuxtConfig({
 
   css: ["~/assets/css/main.css"],
 
+  ui: {
+    theme: {
+      colors: ["primary", "secondary", "tertiary", "info", "success", "warning", "error"],
+    },
+  },
+
   routeRules: {
     // Temporary workaround for prerender regression. see https://github.com/nuxt/nuxt/issues/27490
     "/": { prerender: true },
@@ -26,6 +32,7 @@ export default defineNuxtConfig({
     installCli: true,
     composables: true,
     auth: true,
+    oauth: true,
   },
 
   eslint: {

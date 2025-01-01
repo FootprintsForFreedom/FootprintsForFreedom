@@ -61,7 +61,9 @@ useSeoMeta({
     </UHeader>
 
     <UMain>
-      <NuxtPage />
+      <NuxtLayout>
+        <NuxtPage />
+      </NuxtLayout>
     </UMain>
 
     <UFooter>
