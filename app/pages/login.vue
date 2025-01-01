@@ -26,14 +26,26 @@ const state = reactive({
   email: "",
   password: "",
 })
+const loginForm = ref()
 
-async function onSubmit(event: FormSubmitEvent<Schema>, updateEmail: (value: string) => void, updatePassword: (value: string) => void, submit: () => Promise<void>) {
+const toast = useToast()
+async function onSubmit(
+  event: FormSubmitEvent<Schema>,
+  updateEmail: (value: string) => void,
+  updatePassword: (value: string) => void,
+  submit: () => Promise<void>,
+) {
   updateEmail(event.data.email)
   updatePassword(event.data.password)
-  try {
-    await submit()
-  } catch (error) {
-    console.error(error)
+  await submit()
+  if (!loginForm.value?.success) {
+    console.log("Login failed")
+    toast.add({
+      title: "Login failed",
+      description: "Please check your credentials and try again.",
+      icon: "i-heroicons-exclamation-circle",
+      color: "error",
+    })
   }
 }
 </script>
@@ -41,6 +53,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>, updateEmail: (value: str
 <template>
   <div class="login">
     <EdgeDbAuthEmailLogin
+      :ref="loginForm"
       v-slot="{ updateEmail, updatePassword, submit, loading }"
       redirect-to="/"
     >
