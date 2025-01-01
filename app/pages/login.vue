@@ -1,13 +1,47 @@
 <script setup lang="ts">
+import * as v from "valibot"
+import type { FormSubmitEvent } from "#ui/types"
+
 definePageMeta({
   layout: "auth",
 })
+
+const schema = v.object({
+  email: v.pipe(
+    v.string("E-Mail wird benötigt."),
+    v.trim(),
+    v.nonEmpty("E-Mail wird benötigt."),
+    v.email("E-Mail ist ungültig."),
+  ),
+  password: v.pipe(
+    v.string("Passwort wird benötigt."),
+    v.trim(),
+    v.nonEmpty("Passwort wird benötigt."),
+  ),
+})
+
+type Schema = v.InferOutput<typeof schema>
+
+const state = reactive({
+  email: "",
+  password: "",
+})
+
+async function onSubmit(event: FormSubmitEvent<Schema>, updateEmail: (value: string) => void, updatePassword: (value: string) => void, submit: () => Promise<void>) {
+  updateEmail(event.data.email)
+  updatePassword(event.data.password)
+  try {
+    await submit()
+  } catch (error) {
+    console.error(error)
+  }
+}
 </script>
 
 <template>
   <div class="login">
     <EdgeDbAuthEmailLogin
-      v-slot="{ email, updateEmail, password, updatePassword, submit, loading }"
+      v-slot="{ updateEmail, updatePassword, submit, loading }"
       redirect-to="/"
     >
       <UCard class="max-w-sm w-full bg-white/75 dark:bg-gray-950/50 backdrop-blur">
@@ -15,41 +49,39 @@ definePageMeta({
           <h2>Login</h2>
         </template>
 
-        <div class="flex flex-col gap-4">
-          <UFormField label="Email">
+        <UForm
+          :schema="v.safeParser(schema)"
+          :state="state"
+          class="space-y-4"
+          @submit="onSubmit($event, updateEmail, updatePassword, submit)"
+        >
+          <UFormField
+            label="E-Mail"
+            name="email"
+          >
             <UInput
-              type="email"
-              :value="email"
-              placeholder="your@email.com"
-              @change="(e: any) => updateEmail(e.target.value)"
-              @keyup.enter="() => submit()"
+              v-model="state.email"
             />
           </UFormField>
-          <UFormField label="Password">
+          <UFormField
+            label="Password"
+            name="password"
+          >
             <UInput
+              v-model="state.password"
               type="password"
-              :value="password"
-              placeholder="password"
-              @change="(e: any) => updatePassword(e.target.value)"
-              @keyup.enter="() => submit()"
             />
           </UFormField>
-        </div>
 
-        <template #footer>
-          <div class="flex items-center gap-2">
-            <UButton
-              type="button"
-              color="neutral"
-              :loading="loading"
-              @click="() => submit()"
-            >
-              Login
-            </UButton>
+          <UButton
+            type="submit"
+            :loading="loading"
+          >
+            Login
+          </UButton>
 
-            <OAuthProviders />
-          </div>
-        </template>
+          <OAuthProviders />
+        </UForm>
       </UCard>
     </EdgeDbAuthEmailLogin>
   </div>
