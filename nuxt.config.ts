@@ -1,6 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ["@nuxt/eslint", "@nuxt/ui-pro", "nuxt-edgedb-module"],
+  modules: ["@nuxt/eslint", "@nuxt/ui-pro", "nuxt-edgedb-module", "@pinia/nuxt"],
 
   devtools: {
     enabled: true,
@@ -27,8 +27,8 @@ export default defineNuxtConfig({
 
   edgeDb: {
     devtools: true,
-    dbschemaDir: "server/dbschema",
-    queriesDir: "server/queries",
+    dbschemaDir: "./shared/dbschema",
+    queriesDir: "./server/queries",
     installCli: true,
     composables: true,
     auth: true,
