@@ -22,7 +22,6 @@ async function onSubmit(
   updateEmail(event.data.email)
   updatePassword(event.data.password)
   const response = await submit()
-  console.log(response)
   if (!response) {
     console.log("Login failed")
     toast.add({

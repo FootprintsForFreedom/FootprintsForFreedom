@@ -3,7 +3,6 @@ definePageMeta({
   layout: "auth",
 })
 
-const user = useUserStore()
 const toast = useToast()
 async function checkAndLinkUser(check: () => Promise<unknown>) {
   const verificationToken = useRoute().query.verification_token
@@ -21,13 +20,10 @@ async function checkAndLinkUser(check: () => Promise<unknown>) {
     })
     return
   }
-  const currentUser = await $fetch("/api/users/link", {
+  $fetch("/api/users/link", {
     method: "POST",
   })
-  if (currentUser) {
-    user.setUser(currentUser)
-    navigateTo("/")
-  }
+  navigateTo("/")
 }
 </script>
 
