@@ -66,10 +66,6 @@ useSeoMeta({
       </NuxtLayout>
     </UMain>
 
-    <UFooter>
-      <template #left>
-        Copyright © {{ new Date().getFullYear() }}
-      </template>
-    </UFooter>
+    <BasicFooter />
   </UApp>
 </template>
