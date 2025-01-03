@@ -4,6 +4,7 @@ definePageMeta({
 })
 
 const { update } = useEdgeDbIdentity()
+const user = useUserStore()
 const toast = useToast()
 async function checkAndLinkUser(check: () => Promise<unknown>) {
   const verificationToken = useRoute().query.verification_token
@@ -24,8 +25,17 @@ async function checkAndLinkUser(check: () => Promise<unknown>) {
   const res = await $fetch("/api/users/link", {
     method: "POST",
   })
-  console.log(res)
   await update()
+  if (!res) {
+    toast.add({
+      title: "Verification failed",
+      description: "Please try again",
+      icon: "i-heroicons-exclamation-circle",
+      color: "error",
+    })
+    return
+  }
+  user.setUser(res)
   navigateTo("/")
 }
 </script>

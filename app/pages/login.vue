@@ -12,6 +12,8 @@ const state = reactive({
   password: "",
 })
 
+const { update } = useEdgeDbIdentity()
+const user = useUserStore()
 const toast = useToast()
 async function onSubmit(
   event: FormSubmitEvent<UserLoginInput>,
@@ -22,8 +24,9 @@ async function onSubmit(
   updateEmail(event.data.email)
   updatePassword(event.data.password)
   const response = await submit()
+  const currentUser = await $fetch("/api/users/me")
   console.log(response)
-  if (!response) {
+  if (!response || !currentUser) {
     console.log("Login failed")
     toast.add({
       title: "Login failed",
@@ -33,6 +36,8 @@ async function onSubmit(
     })
   } else {
     console.log("Login successful")
+    user.setUser(currentUser)
+    await update()
   }
 }
 </script>
@@ -40,7 +45,7 @@ async function onSubmit(
 <template>
   <EdgeDbAuthEmailLogin
     v-slot="{ updateEmail, updatePassword, submit, loading }"
-    redirect-to="/peter"
+    :redirect-to="undefined"
   >
     <UCard class="max-w-sm w-full bg-white/75 dark:bg-gray-950/50 backdrop-blur">
       <template #header>
