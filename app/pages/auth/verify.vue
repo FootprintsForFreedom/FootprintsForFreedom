@@ -3,6 +3,7 @@ definePageMeta({
   layout: "auth",
 })
 
+const { update } = useEdgeDbIdentity()
 const toast = useToast()
 async function checkAndLinkUser(check: () => Promise<unknown>) {
   const verificationToken = useRoute().query.verification_token
@@ -20,9 +21,11 @@ async function checkAndLinkUser(check: () => Promise<unknown>) {
     })
     return
   }
-  $fetch("/api/users/link", {
+  const res = await $fetch("/api/users/link", {
     method: "POST",
   })
+  console.log(res)
+  await update()
   navigateTo("/")
 }
 </script>

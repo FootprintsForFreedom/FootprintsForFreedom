@@ -32,7 +32,7 @@ async function onSubmit(
       color: "error",
     })
   } else {
-    $fetch("/api/users", {
+    await $fetch("/api/users", {
       method: "POST",
       body: {
         name: state.name,

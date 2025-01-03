@@ -22,6 +22,7 @@ async function onSubmit(
   updateEmail(event.data.email)
   updatePassword(event.data.password)
   const response = await submit()
+  console.log(response)
   if (!response) {
     console.log("Login failed")
     toast.add({
@@ -30,6 +31,8 @@ async function onSubmit(
       icon: "i-heroicons-exclamation-circle",
       color: "error",
     })
+  } else {
+    console.log("Login successful")
   }
 }
 </script>
@@ -37,7 +40,7 @@ async function onSubmit(
 <template>
   <EdgeDbAuthEmailLogin
     v-slot="{ updateEmail, updatePassword, submit, loading }"
-    redirect-to="/"
+    redirect-to="/peter"
   >
     <UCard class="max-w-sm w-full bg-white/75 dark:bg-gray-950/50 backdrop-blur">
       <template #header>
