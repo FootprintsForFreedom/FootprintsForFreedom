@@ -49,17 +49,19 @@ module default {
 
   abstract type HasTimestamps {
     required created: datetime {
-      rewrite insert using (datetime_of_statement())
+      rewrite insert using (datetime_of_statement());
+      readonly := true;
     }
     required modified: datetime {
-      rewrite update using (datetime_of_statement())
+      rewrite insert, update using (datetime_of_statement())
     }
   }
 
   # Table for users
   type User extending HasTimestamps {
     required name: str;
-    required identity: ext::auth::Identity;
+    required email: str;
+    identity: ext::auth::Identity;
     required role: Role {
       default := <Role>'User';
     }

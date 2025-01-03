@@ -25,7 +25,7 @@ logs
 
 # EdgeDB
 **/*.edgeql.ts
-server/dbschema/queries.*
-server/dbschema/query-builder
-server/dbschema/interfaces.ts
-server/queries/*.query.ts
+**/dbschema/queries.*
+**/dbschema/query-builder
+**/dbschema/interfaces.ts
+**/queries/*.query.ts

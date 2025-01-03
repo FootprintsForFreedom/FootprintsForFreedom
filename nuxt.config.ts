@@ -1,12 +1,18 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ["@nuxt/eslint", "@nuxt/ui-pro", "nuxt-edgedb-module"],
+  modules: ["@nuxt/eslint", "@nuxt/ui-pro", "nuxt-edgedb-module", "@pinia/nuxt"],
 
   devtools: {
     enabled: true,
   },
 
   css: ["~/assets/css/main.css"],
+
+  ui: {
+    theme: {
+      colors: ["primary", "secondary", "tertiary", "info", "success", "warning", "error"],
+    },
+  },
 
   routeRules: {
     // Temporary workaround for prerender regression. see https://github.com/nuxt/nuxt/issues/27490
@@ -21,11 +27,12 @@ export default defineNuxtConfig({
 
   edgeDb: {
     devtools: true,
-    dbschemaDir: "server/dbschema",
-    queriesDir: "server/queries",
+    dbschemaDir: "./shared/dbschema",
+    queriesDir: "./server/queries",
     installCli: true,
     composables: true,
     auth: true,
+    oauth: true,
   },
 
   eslint: {
