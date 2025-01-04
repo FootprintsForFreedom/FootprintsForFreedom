@@ -28,7 +28,7 @@ async function onSubmit(
     console.log("Signup failed")
     toast.add({
       title: "Signup failed",
-      icon: "i-heroicons-exclamation-circle",
+      icon: "i-lucide-circle-alert",
       color: "error",
     })
   } else {
@@ -50,9 +50,9 @@ async function onSubmit(
     :redirect-to="undefined"
   >
     <UCard class="max-w-sm w-full bg-white/75 dark:bg-gray-950/50 backdrop-blur">
-      <template #header>
-        <h2>Sign Up</h2>
-      </template>
+      <p class="text-xl mb-4">
+        Sign Up
+      </p>
 
       <UForm
         :schema="v.safeParser(UserSignupSchema)"
@@ -101,6 +101,9 @@ async function onSubmit(
 
         <OAuthProviders />
       </UForm>
+      <div class="text-center text-sm mt-4">
+        Already have an account? <ULink to="/login">Login</ULink> instead.
+      </div>
     </UCard>
   </EdgeDbAuthEmailSignup>
 </template>
