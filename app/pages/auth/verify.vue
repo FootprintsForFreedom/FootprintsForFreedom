@@ -17,7 +17,7 @@ async function checkAndLinkUser(check: () => Promise<unknown>) {
   if (!result) {
     toast.add({
       title: "Verification failed",
-      icon: "i-heroicons-exclamation-circle",
+      icon: "i-lucide-circle-alert",
       color: "error",
     })
     return
@@ -30,7 +30,7 @@ async function checkAndLinkUser(check: () => Promise<unknown>) {
     toast.add({
       title: "Verification failed",
       description: "Please try again",
-      icon: "i-heroicons-exclamation-circle",
+      icon: "i-lucide-circle-alert",
       color: "error",
     })
     return

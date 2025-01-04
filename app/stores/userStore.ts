@@ -24,7 +24,7 @@ export const useUserStore = defineStore("user", () => {
 
   async function logout() {
     console.log("Logging out")
-    await edgedbIdentity.logout()
+    await edgedbIdentity.logout("/")
     clearUser()
   }
 
