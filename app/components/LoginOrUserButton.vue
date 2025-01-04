@@ -50,7 +50,6 @@ const dropdownItems = computed(() => [
       label: "Logout",
       icon: "i-lucide-log-out",
       onSelect: () => {
-        console.log("logout")
         user.logout()
       },
     },

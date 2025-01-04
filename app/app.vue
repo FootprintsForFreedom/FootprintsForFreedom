@@ -24,7 +24,6 @@ useSeoMeta({
 const user = useUserStore()
 
 await callOnce(async () => {
-  console.log("loading user once")
   await user.loadUser()
 })
 </script>

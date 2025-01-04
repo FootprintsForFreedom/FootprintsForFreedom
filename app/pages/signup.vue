@@ -23,9 +23,7 @@ async function onSubmit(
   updateEmail(event.data.email)
   updatePassword(event.data.password)
   const response = await submit()
-  console.log(response)
   if (!response) {
-    console.log("Signup failed")
     toast.add({
       title: "Signup failed",
       icon: "i-lucide-circle-alert",

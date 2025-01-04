@@ -25,9 +25,7 @@ async function onSubmit(
   updatePassword(event.data.password)
   const response = await submit()
   const currentUser = await $fetch("/api/users/me")
-  console.log(response)
   if (!response || !currentUser) {
-    console.log("Login failed")
     toast.add({
       title: "Login failed",
       description: "Please check your credentials and try again.",
@@ -35,7 +33,6 @@ async function onSubmit(
       color: "error",
     })
   } else {
-    console.log("Login successful")
     user.setUser(currentUser)
     await update()
   }
