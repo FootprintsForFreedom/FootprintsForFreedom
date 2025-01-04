@@ -12,6 +12,8 @@ const state = reactive({
   password: "",
 })
 
+const { update } = useEdgeDbIdentity()
+const user = useUserStore()
 const toast = useToast()
 async function onSubmit(
   event: FormSubmitEvent<UserLoginInput>,
@@ -22,14 +24,17 @@ async function onSubmit(
   updateEmail(event.data.email)
   updatePassword(event.data.password)
   const response = await submit()
-  if (!response) {
-    console.log("Login failed")
+  const currentUser = await $fetch("/api/users/me")
+  if (!response || !currentUser) {
     toast.add({
       title: "Login failed",
       description: "Please check your credentials and try again.",
-      icon: "i-heroicons-exclamation-circle",
+      icon: "i-lucide-circle-alert",
       color: "error",
     })
+  } else {
+    user.setUser(currentUser)
+    await update()
   }
 }
 </script>
@@ -37,13 +42,12 @@ async function onSubmit(
 <template>
   <EdgeDbAuthEmailLogin
     v-slot="{ updateEmail, updatePassword, submit, loading }"
-    redirect-to="/"
+    :redirect-to="undefined"
   >
     <UCard class="max-w-sm w-full bg-white/75 dark:bg-gray-950/50 backdrop-blur">
-      <template #header>
-        <h2>Login</h2>
-      </template>
-
+      <p class="text-xl mb-4">
+        Login
+      </p>
       <UForm
         :schema="v.safeParser(UserLoginSchema)"
         :state="state"
@@ -81,6 +85,9 @@ async function onSubmit(
 
         <OAuthProviders />
       </UForm>
+      <div class="text-center text-sm mt-4">
+        Don't have an account? <ULink to="/signup">Sign Up</ULink> instead.
+      </div>
     </UCard>
   </EdgeDbAuthEmailLogin>
 </template>

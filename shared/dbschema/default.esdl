@@ -57,10 +57,13 @@ module default {
     }
   }
 
-  # Table for users
   type User extending HasTimestamps {
-    required name: str;
-    required email: str;
+    required name: str {
+      constraint exclusive;
+    };
+    required email: str {
+      constraint exclusive;
+    };
     identity: ext::auth::Identity;
     required role: Role {
       default := <Role>'User';
@@ -72,11 +75,9 @@ module default {
     verifiedPlaces := .<verified_by[is PlaceVersion];
     verifiedMedia := .<verified_by[is MediaVersion];
 
-    constraint exclusive on ((.name));
-
     access policy user_themself_has_full_access
       allow all
-      using (global current_user.id ?= .id) {
+      using (global current_user.identity.id ?= .identity.id) {
         errmessage := "Only the user themselves can access this data."
       };
 
@@ -86,8 +87,8 @@ module default {
         errmessage := "Only admins can access this data."
       };
 
-    access policy user_read_and_create_only
-      allow select, insert;
+    access policy user_read_create_update_only
+      allow select, insert, update;
   }
 
   type Language extending HasTimestamps {

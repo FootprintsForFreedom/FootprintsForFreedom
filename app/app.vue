@@ -1,17 +1,4 @@
 <script setup>
-const links = [
-  {
-    label: "Features",
-    to: "#features",
-    exactHash: true,
-  },
-  {
-    label: "Documentation",
-    to: "https://ui.nuxt.com/pro",
-    target: "_blank",
-  },
-]
-
 useHead({
   meta: [{ name: "viewport", content: "width=device-width, initial-scale=1" }],
   link: [{ rel: "icon", href: "/favicon.ico" }],
@@ -33,32 +20,17 @@ useSeoMeta({
   twitterImage: "https://ui-pro-starter.nuxt.dev/social-card.png",
   twitterCard: "summary_large_image",
 })
+
+const user = useUserStore()
+
+await callOnce(async () => {
+  await user.loadUser()
+})
 </script>
 
 <template>
   <UApp>
-    <UHeader :links="links">
-      <template #logo>
-        Nuxt UI Pro <UBadge
-          label="Starter"
-          variant="subtle"
-          class="mb-0.5"
-        />
-      </template>
-
-      <template #right>
-        <UColorModeButton />
-
-        <UButton
-          to="https://github.com/nuxt-ui-pro/starter"
-          target="_blank"
-          icon="i-simple-icons-github"
-          aria-label="GitHub"
-          color="gray"
-          variant="ghost"
-        />
-      </template>
-    </UHeader>
+    <WebsiteHeader />
 
     <UMain>
       <NuxtLayout>
@@ -66,10 +38,6 @@ useSeoMeta({
       </NuxtLayout>
     </UMain>
 
-    <UFooter>
-      <template #left>
-        Copyright © {{ new Date().getFullYear() }}
-      </template>
-    </UFooter>
+    <WebsiteFooter />
   </UApp>
 </template>

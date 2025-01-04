@@ -1,15 +1,19 @@
-CREATE MIGRATION m1s6ayqhuakwy2dza4oglnayipzdgppm3eodk3wzakdrdrahxuoj5a
+CREATE MIGRATION m1rvlwfhmlanf72vn6tc226ufyyy7moigp5ukchsc5ay2zemij7rkq
     ONTO initial
 {
   CREATE EXTENSION pgcrypto VERSION '1.3';
   CREATE EXTENSION auth VERSION '1.0';
   CREATE ABSTRACT TYPE default::HasTimestamps {
       CREATE REQUIRED PROPERTY created: std::datetime {
+          SET readonly := true;
           CREATE REWRITE
               INSERT 
               USING (std::datetime_of_statement());
       };
       CREATE REQUIRED PROPERTY modified: std::datetime {
+          CREATE REWRITE
+              INSERT 
+              USING (std::datetime_of_statement());
           CREATE REWRITE
               UPDATE 
               USING (std::datetime_of_statement());
@@ -17,14 +21,18 @@ CREATE MIGRATION m1s6ayqhuakwy2dza4oglnayipzdgppm3eodk3wzakdrdrahxuoj5a
   };
   CREATE SCALAR TYPE default::Role EXTENDING enum<User, Moderator, Admin>;
   CREATE TYPE default::User EXTENDING default::HasTimestamps {
-      CREATE REQUIRED LINK identity: ext::auth::Identity;
-      CREATE REQUIRED PROPERTY name: std::str;
+      CREATE LINK identity: ext::auth::Identity;
+      CREATE REQUIRED PROPERTY name: std::str {
+          CREATE CONSTRAINT std::exclusive;
+      };
       CREATE REQUIRED PROPERTY role: default::Role {
           SET default := (<default::Role>'User');
       };
+      CREATE REQUIRED PROPERTY email: std::str {
+          CREATE CONSTRAINT std::exclusive;
+      };
       CREATE ACCESS POLICY user_read_and_create_only
           ALLOW SELECT, INSERT ;
-      CREATE CONSTRAINT std::exclusive ON (.name);
   };
   CREATE ABSTRACT TYPE default::HasCreator {
       CREATE LINK created_by: default::User;
@@ -33,7 +41,8 @@ CREATE MIGRATION m1s6ayqhuakwy2dza4oglnayipzdgppm3eodk3wzakdrdrahxuoj5a
       default::User {
           id,
           name,
-          role
+          role,
+          identity
       }
   FILTER
       (.identity = GLOBAL ext::auth::ClientTokenIdentity)
@@ -127,6 +136,7 @@ CREATE MIGRATION m1s6ayqhuakwy2dza4oglnayipzdgppm3eodk3wzakdrdrahxuoj5a
   };
   CREATE SCALAR TYPE default::VersionStatus EXTENDING enum<Draft, Pending_Verification, Approved, Changes_Requested, Rejected>;
   CREATE ABSTRACT TYPE default::HasStatus {
+      CREATE LINK verified_by: default::User;
       CREATE REQUIRED PROPERTY status: default::VersionStatus {
           SET default := (<default::VersionStatus>'Draft');
       };
@@ -150,7 +160,6 @@ CREATE MIGRATION m1s6ayqhuakwy2dza4oglnayipzdgppm3eodk3wzakdrdrahxuoj5a
       CREATE LINK file: default::MediaFile;
       CREATE ACCESS POLICY media_version_read_only
           ALLOW SELECT ;
-      CREATE LINK verified_by: default::User;
   };
   ALTER TYPE default::ChangeRequest {
       CREATE REQUIRED LINK version_with_status: default::HasStatus;
@@ -188,7 +197,6 @@ CREATE MIGRATION m1s6ayqhuakwy2dza4oglnayipzdgppm3eodk3wzakdrdrahxuoj5a
       CREATE REQUIRED LINK place: default::Place;
       CREATE ACCESS POLICY place_version_read_only
           ALLOW SELECT ;
-      CREATE LINK verified_by: default::User;
   };
   ALTER TYPE default::User {
       CREATE ACCESS POLICY admin_has_full_access
@@ -196,7 +204,7 @@ CREATE MIGRATION m1s6ayqhuakwy2dza4oglnayipzdgppm3eodk3wzakdrdrahxuoj5a
               SET errmessage := 'Only admins can access this data.';
           };
       CREATE ACCESS POLICY user_themself_has_full_access
-          ALLOW ALL USING (((GLOBAL default::current_user).id ?= .id)) {
+          ALLOW ALL USING (((GLOBAL default::current_user).identity ?= .identity)) {
               SET errmessage := 'Only the user themselves can access this data.';
           };
       CREATE LINK change_requests := (.<created_by[IS default::ChangeRequest]);
