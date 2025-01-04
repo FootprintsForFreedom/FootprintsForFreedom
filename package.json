@@ -10,7 +10,8 @@
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
-    "typecheck": "nuxt typecheck"
+    "typecheck": "nuxt typecheck",
+    "seed": "tsx server/seeds/seed.ts"
   },
   "dependencies": {
     "@iconify-json/simple-icons": "^1.2.17",
