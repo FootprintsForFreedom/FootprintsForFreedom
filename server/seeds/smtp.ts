@@ -14,7 +14,6 @@ export default class SmtpSeed extends Seed {
   }
 
   async setSmtpConfig() {
-    console.log("Hello")
     await this.client.query(`
     CONFIGURE CURRENT BRANCH SET
     ext::auth::SMTPConfig::sender := '${this.runtimeConfig.smtpSender}';
@@ -31,6 +30,5 @@ export default class SmtpSeed extends Seed {
     CONFIGURE CURRENT BRANCH SET
     ext::auth::SMTPConfig::validate_certs := ${this.runtimeConfig.smtpValidateCerts};
   `)
-    console.log("Hello2")
   }
 }
