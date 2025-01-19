@@ -1,11 +1,13 @@
-import * as dotenv from "dotenv"
-import { configureAuth } from "./auth"
+import { createClient } from "edgedb"
 
-async function seed() {
-  await configureAuth()
+export default class Seed {
+  name: string
+  seed: () => Promise<void>
+
+  client = createClient()
+
+  constructor(name: string, seed: () => Promise<void>) {
+    this.name = name
+    this.seed = seed
+  }
 }
-
-const env = process.env.NODE_ENV || "development"
-dotenv.config({ path: `.env.${env}` })
-
-await seed()

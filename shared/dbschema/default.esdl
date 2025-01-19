@@ -57,6 +57,16 @@ module default {
     }
   }
 
+  type SeedStatus extending HasTimestamps {
+    required seed_name: str {
+      constraint exclusive;
+    }
+    required performed_at: datetime {
+      readonly := true;
+      rewrite insert using (datetime_of_statement());
+    }
+  }
+
   type User extending HasTimestamps {
     required name: str {
       constraint exclusive;
@@ -72,8 +82,8 @@ module default {
     places := .<created_by[is PlaceVersion];
     media := .<created_by[is MediaVersion];
     change_requests := .<created_by[is ChangeRequest];
-    verifiedPlaces := .<verified_by[is PlaceVersion];
-    verifiedMedia := .<verified_by[is MediaVersion];
+    verified_places := .<verified_by[is PlaceVersion];
+    verified_media := .<verified_by[is MediaVersion];
 
     access policy user_themself_has_full_access
       allow all

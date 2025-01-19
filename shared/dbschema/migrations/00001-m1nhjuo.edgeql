@@ -1,4 +1,4 @@
-CREATE MIGRATION m1rvlwfhmlanf72vn6tc226ufyyy7moigp5ukchsc5ay2zemij7rkq
+CREATE MIGRATION m1nhjuosebkyr6xqzehug35nzezgpzl2lm7nvbngehoicjrsxsbteq
     ONTO initial
 {
   CREATE EXTENSION pgcrypto VERSION '1.3';
@@ -31,8 +31,8 @@ CREATE MIGRATION m1rvlwfhmlanf72vn6tc226ufyyy7moigp5ukchsc5ay2zemij7rkq
       CREATE REQUIRED PROPERTY email: std::str {
           CREATE CONSTRAINT std::exclusive;
       };
-      CREATE ACCESS POLICY user_read_and_create_only
-          ALLOW SELECT, INSERT ;
+      CREATE ACCESS POLICY user_read_create_update_only
+          ALLOW SELECT, UPDATE, INSERT ;
   };
   CREATE ABSTRACT TYPE default::HasCreator {
       CREATE LINK created_by: default::User;
@@ -41,8 +41,7 @@ CREATE MIGRATION m1rvlwfhmlanf72vn6tc226ufyyy7moigp5ukchsc5ay2zemij7rkq
       default::User {
           id,
           name,
-          role,
-          identity
+          role
       }
   FILTER
       (.identity = GLOBAL ext::auth::ClientTokenIdentity)
@@ -204,7 +203,7 @@ CREATE MIGRATION m1rvlwfhmlanf72vn6tc226ufyyy7moigp5ukchsc5ay2zemij7rkq
               SET errmessage := 'Only admins can access this data.';
           };
       CREATE ACCESS POLICY user_themself_has_full_access
-          ALLOW ALL USING (((GLOBAL default::current_user).identity ?= .identity)) {
+          ALLOW ALL USING (((GLOBAL default::current_user).identity.id ?= .identity.id)) {
               SET errmessage := 'Only the user themselves can access this data.';
           };
       CREATE LINK change_requests := (.<created_by[IS default::ChangeRequest]);

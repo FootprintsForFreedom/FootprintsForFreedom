@@ -14,6 +14,14 @@ export default defineNuxtConfig({
     },
   },
 
+  runtimeConfig: {
+    smtpSender: "noreply@test.test",
+    smtpHost: "localhost",
+    smtpPort: 1025,
+    smtpSecurity: "STARTTLSOrPlainText",
+    smtpValidateCerts: "true",
+  },
+
   routeRules: {
     // Temporary workaround for prerender regression. see https://github.com/nuxt/nuxt/issues/27490
     "/": { prerender: true },

@@ -26,6 +26,7 @@
     "@iconify-json/lucide": "^1.2.20",
     "@nuxt/eslint": "^0.7.4",
     "eslint": "^9.17.0",
+    "tsx": "^4.19.2",
     "vue-tsc": "^2.2.0"
   },
   "resolutions": {
