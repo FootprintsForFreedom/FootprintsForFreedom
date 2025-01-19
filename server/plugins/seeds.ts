@@ -1,28 +1,35 @@
+import { Effect, pipe } from "effect"
 import AuthSeed from "../seeds/auth"
 import type Seed from "../seeds/seed"
 import SmtpSeed from "../seeds/smtp"
 
 export default defineNitroPlugin(async () => {
-  const onlyOnceSeeds: Seed[] = [
+  const seeds: Seed[] = [
     new AuthSeed(),
-  ]
-
-  const alwaysSeeds: Seed[] = [
     new SmtpSeed(),
   ]
 
-  const { checkSeed, createSeed } = useEdgeDbQueries()
-  for (const seed of onlyOnceSeeds) {
-    const exists = await checkSeed({ seed_name: seed.name })
-    if (!exists) {
-      await seed.seed()
-      await createSeed({ seed_name: seed.name })
-      console.log(`Seeded ${seed.name}`)
-    }
-  }
+  const executeSeed = (seed: Seed): Effect.Effect<void> =>
+    Effect.promise(seed.seed).pipe(
+      Effect.flatMap(() => Effect.promise(seed.afterRunSeed)),
+      Effect.tap(() => Effect.logInfo(`Seeded ${seed.name}`)),
+    )
 
-  for (const seed of alwaysSeeds) {
-    await seed.seed()
-    console.log(`Seeded ${seed.name}`)
-  }
+  const checkAndSeed = (seed: Seed): Effect.Effect<boolean> =>
+    Effect.promise(seed.shouldRunSeed).pipe(
+      Effect.flatMap(shouldRunSeed => shouldRunSeed
+        ? pipe(
+            executeSeed(seed),
+            Effect.map(() => true),
+          )
+        : pipe(
+            Effect.logInfo(`Seed ${seed.name} already exists`),
+            Effect.map(() => false),
+          ),
+      ),
+    )
+
+  const program = Effect.all(seeds.map(checkAndSeed), { concurrency: "unbounded" })
+
+  return Effect.runPromise(program)
 })

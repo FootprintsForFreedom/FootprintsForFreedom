@@ -3,8 +3,16 @@ import Seed from "./seed"
 
 export default class AuthSeed extends Seed {
   constructor() {
-    super("auth", async () => {
-      await this.seedAuth()
+    super("auth", {
+      seed: async () => {
+        await this.seedAuth()
+      },
+      shouldRunSeed: async () => {
+        return this.checkShouldSeed()
+      },
+      afterRunSeed: async () => {
+        return this.storeSeed()
+      },
     })
   }
 
@@ -53,6 +61,17 @@ export default class AuthSeed extends Seed {
         require_verification := true,
     };
     `)
+  }
+
+  async checkShouldSeed() {
+    const { checkSeed } = useEdgeDbQueries()
+    const exists = await checkSeed({ seed_name: this.name })
+    return !exists
+  }
+
+  async storeSeed() {
+    const { createSeed } = useEdgeDbQueries()
+    await createSeed({ seed_name: this.name })
   }
 
   async seedAuth() {
