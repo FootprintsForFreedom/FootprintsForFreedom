@@ -8,6 +8,10 @@ module default {
     ))
   );
 
+  global server_admin: bool {
+    default := false;
+  }
+
   scalar type Role extending enum<User, Moderator, Admin>;
   scalar type VersionStatus extending enum<Draft, Pending_Verification, Approved, Changes_Requested, Rejected>;
   scalar type MediaFileTypes extending enum<Image, Video, Audio, Document>;
@@ -102,9 +106,18 @@ module default {
   }
 
   type Language extending HasTimestamps {
-    required code: str;
-    required name: str;
-    order: int16;
+    required code: str {
+      constraint exclusive;
+    }
+    required name: str {
+      constraint exclusive;
+    }
+    required native_name: str {
+      constraint exclusive;
+    }
+    order: int16 {
+      constraint exclusive;
+    }
 
     access policy admin_has_full_access
       allow all
@@ -112,18 +125,29 @@ module default {
         errmessage := "Only admins can access this data."
       };
 
+    access policy server_admin_has_full_access
+      allow all
+      using (global server_admin ?= true) {
+        errmessage := "Only server admins can access this data."
+      };
+
     access policy language_read_only
       allow select;
   }
 
   type LegalDocument extending HasTitle, HasTimestamps {
-    required content: str;
-    multi translations := .<document[is LegalDocumentTranslation];
+    translations := .<document[is LegalDocumentTranslation];
 
     access policy admin_has_full_access
       allow all
       using (global current_user.role ?= <Role>'Admin') {
         errmessage := "Only admins can access this data."
+      };
+
+    access policy server_admin_has_full_access
+      allow all
+      using (global server_admin ?= true) {
+        errmessage := "Only server admins can access this data."
       };
 
     access policy legal_document_read_only
@@ -138,6 +162,12 @@ module default {
       allow all
       using (global current_user.role ?= <Role>'Admin') {
         errmessage := "Only admins can access this data."
+      };
+
+    access policy server_admin_has_full_access
+      allow all
+      using (global server_admin ?= true) {
+        errmessage := "Only server admins can access this data."
       };
 
     access policy legal_document_translation_read_only

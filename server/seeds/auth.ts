@@ -39,22 +39,10 @@ export default class AuthSeed extends Seed {
     })
   }
 
-  shouldRunSeed(): Effect.Effect<boolean, Error> {
-    const { checkSeed } = useEdgeDbQueries()
-    return Effect.promise(() => checkSeed({ seed_name: this.name })).pipe(
-      Effect.map(exists => !exists),
-    )
-  }
-
   seed(): Effect.Effect<void, Error> {
     return Effect.all([
       this.setSigningKey(),
       this.enableEmailPasswordAuth(),
     ], { concurrency: "unbounded" })
-  }
-
-  afterRunSeed(): Effect.Effect<void, Error> {
-    const { createSeed } = useEdgeDbQueries()
-    return Effect.promise(() => createSeed({ seed_name: this.name }))
   }
 }

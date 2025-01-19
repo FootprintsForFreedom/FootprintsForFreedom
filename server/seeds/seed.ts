@@ -1,10 +1,12 @@
-import { createClient } from "edgedb"
 import { Effect } from "effect"
 
-export default class Seed {
+export default abstract class Seed {
   name: string
 
-  client = createClient()
+  client = useEdgeDb().withGlobals({
+    server_admin: true,
+  })
+
   runtimeConfig = useRuntimeConfig()
 
   constructor(name: string) {
@@ -12,14 +14,16 @@ export default class Seed {
   }
 
   shouldRunSeed(): Effect.Effect<boolean, Error> {
-    return Effect.fail(new Error("Not implemented"))
+    const { checkSeed } = useEdgeDbQueries()
+    return Effect.promise(() => checkSeed({ seed_name: this.name })).pipe(
+      Effect.map(exists => !exists),
+    )
   }
 
-  seed(): Effect.Effect<void, Error> {
-    return Effect.fail(new Error("Not implemented"))
-  }
+  abstract seed(): Effect.Effect<void, Error>
 
   afterRunSeed(): Effect.Effect<void, Error> {
-    return Effect.fail(new Error("Not implemented"))
+    const { createSeed } = useEdgeDbQueries()
+    return Effect.promise(() => createSeed({ seed_name: this.name }))
   }
 }

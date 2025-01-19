@@ -1,0 +1,31 @@
+import { Effect } from "effect"
+import slugify from "../utils/slugify"
+import Seed from "./seed"
+import { createLegalDocument, createLegalDocumentTranslation } from "#edgedb/queries"
+
+export default class LegalSeed extends Seed {
+  constructor() {
+    super("legal")
+  }
+
+  createLegalDocument(title: string, content: string): Effect.Effect<void> {
+    const slug = slugify(title)
+    return Effect.promise(() => {
+      return createLegalDocument(this.client, { title, slug })
+    }).pipe(
+      Effect.flatMap(legalDocumentId =>
+        Effect.promise(() => {
+          return createLegalDocumentTranslation(this.client, { title, slug, documentId: legalDocumentId.id, content, languageCode: "en" })
+        }),
+      ),
+    )
+  }
+
+  seed(): Effect.Effect<void, Error> {
+    return Effect.all([
+      this.createLegalDocument("Terms of Service", "This is the terms of service"),
+      this.createLegalDocument("Privacy Policy", "This is the privacy policy"),
+      this.createLegalDocument("Imprint", "This is the imprint"),
+    ], { concurrency: "unbounded" })
+  }
+}
