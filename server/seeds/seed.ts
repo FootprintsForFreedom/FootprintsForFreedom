@@ -1,17 +1,25 @@
 import { createClient } from "edgedb"
+import { Effect } from "effect"
 
 export default class Seed {
   name: string
-  seed: () => Promise<void>
-  shouldRunSeed: () => Promise<boolean>
-  afterRunSeed: () => Promise<void>
 
   client = createClient()
+  runtimeConfig = useRuntimeConfig()
 
-  constructor(name: string, { seed, shouldRunSeed, afterRunSeed }: { seed: () => Promise<void>, shouldRunSeed: () => Promise<boolean>, afterRunSeed: () => Promise<void> }) {
+  constructor(name: string) {
     this.name = name
-    this.seed = seed
-    this.shouldRunSeed = shouldRunSeed
-    this.afterRunSeed = afterRunSeed
+  }
+
+  shouldRunSeed(): Effect.Effect<boolean, Error> {
+    return Effect.fail(new Error("Not implemented"))
+  }
+
+  seed(): Effect.Effect<void, Error> {
+    return Effect.fail(new Error("Not implemented"))
+  }
+
+  afterRunSeed(): Effect.Effect<void, Error> {
+    return Effect.fail(new Error("Not implemented"))
   }
 }

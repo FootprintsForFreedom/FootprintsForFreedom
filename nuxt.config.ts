@@ -20,6 +20,7 @@ export default defineNuxtConfig({
     smtpPort: 1025,
     smtpSecurity: "STARTTLSOrPlainText",
     smtpValidateCerts: "true",
+    allowedRedirectUrls: ["http://localhost:3000"],
   },
 
   routeRules: {
