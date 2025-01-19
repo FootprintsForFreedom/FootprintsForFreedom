@@ -9,14 +9,14 @@ export default defineNitroPlugin(async () => {
     new SmtpSeed(),
   ]
 
-  const executeSeed = (seed: Seed): Effect.Effect<void> =>
-    Effect.promise(seed.seed).pipe(
-      Effect.flatMap(() => Effect.promise(seed.afterRunSeed)),
+  const executeSeed = (seed: Seed): Effect.Effect<void, Error> =>
+    seed.seed().pipe(
+      Effect.map(() => seed.afterRunSeed),
       Effect.tap(() => Effect.logInfo(`Seeded ${seed.name}`)),
     )
 
-  const checkAndSeed = (seed: Seed): Effect.Effect<boolean> =>
-    Effect.promise(seed.shouldRunSeed).pipe(
+  const checkAndSeed = (seed: Seed): Effect.Effect<boolean, Error> =>
+    seed.shouldRunSeed().pipe(
       Effect.flatMap(shouldRunSeed => shouldRunSeed
         ? pipe(
             executeSeed(seed),
