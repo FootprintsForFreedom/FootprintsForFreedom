@@ -1,4 +1,4 @@
-CREATE MIGRATION m1nhjuosebkyr6xqzehug35nzezgpzl2lm7nvbngehoicjrsxsbteq
+CREATE MIGRATION m12at4nj457f37vpvaybouv2hxzq5a3ujiqpqviot544k6nagjyljq
     ONTO initial
 {
   CREATE EXTENSION pgcrypto VERSION '1.3';
@@ -69,9 +69,18 @@ CREATE MIGRATION m1nhjuosebkyr6xqzehug35nzezgpzl2lm7nvbngehoicjrsxsbteq
           };
       CREATE ACCESS POLICY language_read_only
           ALLOW SELECT ;
-      CREATE REQUIRED PROPERTY code: std::str;
-      CREATE REQUIRED PROPERTY name: std::str;
-      CREATE PROPERTY order: std::int16;
+      CREATE REQUIRED PROPERTY code: std::str {
+          CREATE CONSTRAINT std::exclusive;
+      };
+      CREATE REQUIRED PROPERTY name: std::str {
+          CREATE CONSTRAINT std::exclusive;
+      };
+      CREATE REQUIRED PROPERTY native_name: std::str {
+          CREATE CONSTRAINT std::exclusive;
+      };
+      CREATE PROPERTY order: std::int16 {
+          CREATE CONSTRAINT std::exclusive;
+      };
   };
   CREATE ABSTRACT TYPE default::HasTitle {
       CREATE REQUIRED PROPERTY slug: std::str;
@@ -88,7 +97,6 @@ CREATE MIGRATION m1nhjuosebkyr6xqzehug35nzezgpzl2lm7nvbngehoicjrsxsbteq
           };
       CREATE ACCESS POLICY legal_document_read_only
           ALLOW SELECT ;
-      CREATE REQUIRED PROPERTY content: std::str;
   };
   CREATE TYPE default::LegalDocumentTranslation EXTENDING default::HasLocalizedTitle, default::HasTimestamps {
       CREATE ACCESS POLICY admin_has_full_access
@@ -208,9 +216,9 @@ CREATE MIGRATION m1nhjuosebkyr6xqzehug35nzezgpzl2lm7nvbngehoicjrsxsbteq
           };
       CREATE LINK change_requests := (.<created_by[IS default::ChangeRequest]);
       CREATE LINK media := (.<created_by[IS default::MediaVersion]);
-      CREATE LINK verifiedMedia := (.<verified_by[IS default::MediaVersion]);
+      CREATE LINK verified_media := (.<verified_by[IS default::MediaVersion]);
       CREATE LINK places := (.<created_by[IS default::PlaceVersion]);
-      CREATE LINK verifiedPlaces := (.<verified_by[IS default::PlaceVersion]);
+      CREATE LINK verified_places := (.<verified_by[IS default::PlaceVersion]);
   };
   ALTER TYPE default::Media {
       CREATE REQUIRED LINK file: default::MediaFile;
@@ -228,8 +236,38 @@ CREATE MIGRATION m1nhjuosebkyr6xqzehug35nzezgpzl2lm7nvbngehoicjrsxsbteq
               USING (GLOBAL default::current_user);
       };
   };
+  CREATE GLOBAL default::server_admin -> std::bool {
+      SET default := false;
+  };
+  ALTER TYPE default::Language {
+      CREATE ACCESS POLICY server_admin_has_full_access
+          ALLOW ALL USING ((GLOBAL default::server_admin ?= true)) {
+              SET errmessage := 'Only server admins can access this data.';
+          };
+  };
   ALTER TYPE default::LegalDocument {
-      CREATE MULTI LINK translations := (.<document[IS default::LegalDocumentTranslation]);
+      CREATE ACCESS POLICY server_admin_has_full_access
+          ALLOW ALL USING ((GLOBAL default::server_admin ?= true)) {
+              SET errmessage := 'Only server admins can access this data.';
+          };
+      CREATE LINK translations := (.<document[IS default::LegalDocumentTranslation]);
+  };
+  ALTER TYPE default::LegalDocumentTranslation {
+      CREATE ACCESS POLICY server_admin_has_full_access
+          ALLOW ALL USING ((GLOBAL default::server_admin ?= true)) {
+              SET errmessage := 'Only server admins can access this data.';
+          };
+  };
+  CREATE TYPE default::SeedStatus EXTENDING default::HasTimestamps {
+      CREATE REQUIRED PROPERTY performed_at: std::datetime {
+          SET readonly := true;
+          CREATE REWRITE
+              INSERT 
+              USING (std::datetime_of_statement());
+      };
+      CREATE REQUIRED PROPERTY seed_name: std::str {
+          CREATE CONSTRAINT std::exclusive;
+      };
   };
   ALTER TYPE default::Place {
       CREATE LINK versions := (.<place[IS default::PlaceVersion]);

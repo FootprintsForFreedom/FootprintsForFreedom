@@ -1,20 +1,13 @@
+import { Effect } from "effect"
 import Seed from "./seed"
 
 export default class SmtpSeed extends Seed {
-  runtimeConfig = useRuntimeConfig()
-
   constructor() {
-    super("smtp", {
-      seed: async () => {
-        await this.setSmtpConfig()
-      },
-      shouldRunSeed: async () => true,
-      afterRunSeed: async () => {},
-    })
+    super("smtp")
   }
 
-  async setSmtpConfig() {
-    await this.client.query(`
+  setSmtpConfig(): Effect.Effect<void, Error> {
+    return Effect.tryPromise(() => this.client.query(`
     CONFIGURE CURRENT BRANCH SET
     ext::auth::SMTPConfig::sender := '${this.runtimeConfig.smtpSender}';
 
@@ -29,6 +22,18 @@ export default class SmtpSeed extends Seed {
 
     CONFIGURE CURRENT BRANCH SET
     ext::auth::SMTPConfig::validate_certs := ${this.runtimeConfig.smtpValidateCerts};
-  `)
+  `))
+  }
+
+  shouldRunSeed(): Effect.Effect<boolean, Error> {
+    return Effect.succeed(true)
+  }
+
+  seed(): Effect.Effect<void, Error> {
+    return this.setSmtpConfig()
+  }
+
+  afterRunSeed(): Effect.Effect<void, Error> {
+    return Effect.succeed(undefined)
   }
 }

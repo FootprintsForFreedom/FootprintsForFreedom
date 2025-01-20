@@ -1,17 +1,29 @@
-import { createClient } from "edgedb"
+import { Effect } from "effect"
 
-export default class Seed {
+export default abstract class Seed {
   name: string
-  seed: () => Promise<void>
-  shouldRunSeed: () => Promise<boolean>
-  afterRunSeed: () => Promise<void>
 
-  client = createClient()
+  client = useEdgeDb().withGlobals({
+    server_admin: true,
+  })
 
-  constructor(name: string, { seed, shouldRunSeed, afterRunSeed }: { seed: () => Promise<void>, shouldRunSeed: () => Promise<boolean>, afterRunSeed: () => Promise<void> }) {
+  runtimeConfig = useRuntimeConfig()
+
+  constructor(name: string) {
     this.name = name
-    this.seed = seed
-    this.shouldRunSeed = shouldRunSeed
-    this.afterRunSeed = afterRunSeed
+  }
+
+  shouldRunSeed(): Effect.Effect<boolean, Error> {
+    const { checkSeed } = useEdgeDbQueries()
+    return Effect.tryPromise(() => checkSeed({ seed_name: this.name })).pipe(
+      Effect.map(exists => !exists),
+    )
+  }
+
+  abstract seed(): Effect.Effect<void, Error>
+
+  afterRunSeed(): Effect.Effect<void, Error> {
+    const { createSeed } = useEdgeDbQueries()
+    return Effect.tryPromise(() => createSeed({ seed_name: this.name }))
   }
 }
