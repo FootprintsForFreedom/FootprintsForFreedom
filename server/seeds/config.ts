@@ -6,8 +6,8 @@ export default class ConfigSeed extends Seed {
     super("config")
   }
 
-  setAppName(): Effect.Effect<void> {
-    return Effect.promise(() => {
+  setAppName(): Effect.Effect<void, Error> {
+    return Effect.tryPromise(() => {
       return this.client.query(`
         CONFIGURE CURRENT BRANCH SET
         ext::auth::AuthConfig::app_name := "Footprints";
@@ -15,8 +15,8 @@ export default class ConfigSeed extends Seed {
     })
   }
 
-  setAllowedRedirectUrls(): Effect.Effect<void> {
-    return Effect.promise(() => {
+  setAllowedRedirectUrls(): Effect.Effect<void, Error> {
+    return Effect.tryPromise(() => {
       const allowedRedirectUrls = this.runtimeConfig.allowedRedirectUrls
       return this.client.query(`
         CONFIGURE CURRENT BRANCH SET

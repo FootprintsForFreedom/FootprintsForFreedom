@@ -6,8 +6,8 @@ export default class SmtpSeed extends Seed {
     super("smtp")
   }
 
-  setSmtpConfig(): Effect.Effect<void> {
-    return Effect.promise(() => this.client.query(`
+  setSmtpConfig(): Effect.Effect<void, Error> {
+    return Effect.tryPromise(() => this.client.query(`
     CONFIGURE CURRENT BRANCH SET
     ext::auth::SMTPConfig::sender := '${this.runtimeConfig.smtpSender}';
 

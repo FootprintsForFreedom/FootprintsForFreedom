@@ -7,8 +7,8 @@ export default class LanguageSeed extends Seed {
     super("language")
   }
 
-  createLanguage(name: string, code: string, nativeName: string): Effect.Effect<void> {
-    return Effect.promise(() => {
+  createLanguage(name: string, code: string, nativeName: string): Effect.Effect<void, Error> {
+    return Effect.tryPromise(() => {
       return createLanguage(this.client, { name, code, native_name: nativeName })
     })
   }

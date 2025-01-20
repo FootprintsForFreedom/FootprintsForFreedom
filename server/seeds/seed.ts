@@ -15,7 +15,7 @@ export default abstract class Seed {
 
   shouldRunSeed(): Effect.Effect<boolean, Error> {
     const { checkSeed } = useEdgeDbQueries()
-    return Effect.promise(() => checkSeed({ seed_name: this.name })).pipe(
+    return Effect.tryPromise(() => checkSeed({ seed_name: this.name })).pipe(
       Effect.map(exists => !exists),
     )
   }
@@ -24,6 +24,6 @@ export default abstract class Seed {
 
   afterRunSeed(): Effect.Effect<void, Error> {
     const { createSeed } = useEdgeDbQueries()
-    return Effect.promise(() => createSeed({ seed_name: this.name }))
+    return Effect.tryPromise(() => createSeed({ seed_name: this.name }))
   }
 }

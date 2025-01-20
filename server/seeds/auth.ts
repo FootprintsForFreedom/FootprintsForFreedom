@@ -16,10 +16,10 @@ export default class AuthSeed extends Seed {
     )
   }
 
-  setSigningKey(): Effect.Effect<void> {
+  setSigningKey(): Effect.Effect<void, Error> {
     return this.generateSecureRandomKey(64).pipe(
       Effect.flatMap(authSigningKey =>
-        Effect.promise(() => {
+        Effect.tryPromise(() => {
           return this.client.query(`
           CONFIGURE CURRENT BRANCH SET
           ext::auth::AuthConfig::auth_signing_key := "${authSigningKey}";
@@ -28,8 +28,8 @@ export default class AuthSeed extends Seed {
       ))
   }
 
-  enableEmailPasswordAuth(): Effect.Effect<void> {
-    return Effect.promise(() => {
+  enableEmailPasswordAuth(): Effect.Effect<void, Error> {
+    return Effect.tryPromise(() => {
       return this.client.query(`
       CONFIGURE CURRENT BRANCH
       INSERT ext::auth::EmailPasswordProviderConfig {

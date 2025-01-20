@@ -8,13 +8,13 @@ export default class LegalSeed extends Seed {
     super("legal")
   }
 
-  createLegalDocument(title: string, content: string): Effect.Effect<void> {
+  createLegalDocument(title: string, content: string): Effect.Effect<void, Error> {
     const slug = slugify(title)
-    return Effect.promise(() => {
+    return Effect.tryPromise(() => {
       return createLegalDocument(this.client, { title, slug })
     }).pipe(
       Effect.flatMap(legalDocumentId =>
-        Effect.promise(() => {
+        Effect.tryPromise(() => {
           return createLegalDocumentTranslation(this.client, { title, slug, documentId: legalDocumentId.id, content, languageCode: "en" })
         }),
       ),
