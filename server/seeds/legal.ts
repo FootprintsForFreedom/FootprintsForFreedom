@@ -1,5 +1,4 @@
 import { Effect } from "effect"
-import slugify from "../utils/slugify"
 import Seed from "./seed"
 import { createLegalDocument, createLegalDocumentTranslation } from "#edgedb/queries"
 
