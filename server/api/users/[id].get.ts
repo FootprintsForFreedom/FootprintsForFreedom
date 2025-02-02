@@ -7,7 +7,7 @@ export default defineEventHandler(async (req) => {
     yield * Effect.logInfo(`Fetching user with id ${id}`)
 
     // Fetch user
-    const user = yield * executeDatabaseQuery(req, "getUser", { id: id })
+    const user = yield * executeDatabaseQuery(req, "getUser", { id })
     if (!user) {
       return yield * new UserNotFoundError({ id: id })
     }
