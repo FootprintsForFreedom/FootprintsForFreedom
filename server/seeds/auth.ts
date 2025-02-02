@@ -17,7 +17,8 @@ export default class AuthSeed extends Seed {
   }
 
   setSigningKey(): Effect.Effect<void, Error> {
-    return this.generateSecureRandomKey(64).pipe(
+    return pipe(
+      this.generateSecureRandomKey(64),
       Effect.flatMap(authSigningKey =>
         Effect.tryPromise(() => {
           return this.client.query(`

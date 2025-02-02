@@ -37,5 +37,5 @@ export default defineNitroPlugin(async () => {
 
   const program = Effect.all(seeds.map(checkAndSeed))
 
-  return Effect.runPromise(program)
+  return RuntimeClient.runPromise(program)
 })
