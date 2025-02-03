@@ -11,3 +11,7 @@ export class DatabaseTypeError extends Data.TaggedError("DatabaseTypeError")<{
 export class UserNotFoundError extends Data.TaggedError("UserNotFoundError")<{
   id: string
 }> {}
+
+export class UnauthorizedError extends Data.TaggedError("UnauthorizedError")<{
+  path: string
+}> {}

@@ -17,7 +17,10 @@ export function rethrowDatabaseError(error: unknown): Error {
 
 export function handleError(error: unknown): Effect.Effect<H3Error> {
   return Effect.gen(function* () {
-    if (error instanceof UserNotFoundError) {
+    if (error instanceof UnauthorizedError) {
+      yield * Effect.logInfo(`Unauthorized error at path ${error.path}`)
+      return createError({ status: 401, message: "Unauthorized" })
+    } else if (error instanceof UserNotFoundError) {
       yield * Effect.logInfo(`User with id ${error.id} not found`)
       return createError({ status: 404, message: `User with id ${error.id} not found` })
     } else if (error instanceof DatabaseTypeError) {
