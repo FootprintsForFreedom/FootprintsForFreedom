@@ -1,6 +1,7 @@
 import { Effect } from "effect"
+import { H3Error } from "h3"
 
-export function runPromiseAndCatch<T>(
+export async function runPromiseAndCatch<T>(
   handler: Effect.Effect<T, Error>,
   name: string,
 ) {
@@ -9,5 +10,10 @@ export function runPromiseAndCatch<T>(
     Effect.withSpan(name),
   )
 
-  return RuntimeClient.runPromise(main)
+  const result = await RuntimeClient.runPromise(main)
+  if (result instanceof H3Error) {
+    throw result
+  } else {
+    return result
+  }
 }
