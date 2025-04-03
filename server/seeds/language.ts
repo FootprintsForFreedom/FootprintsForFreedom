@@ -1,6 +1,6 @@
 import { Effect } from "effect"
 import Seed from "./seed"
-import { createLanguage } from "#edgedb/queries"
+import { createLanguage } from "~~/shared/dbschema/queries"
 
 export default class LanguageSeed extends Seed {
   constructor() {

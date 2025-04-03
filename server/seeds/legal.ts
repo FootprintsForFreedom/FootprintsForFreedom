@@ -1,6 +1,6 @@
 import { Effect } from "effect"
 import Seed from "./seed"
-import { createLegalDocument, createLegalDocumentTranslation } from "#edgedb/queries"
+import { createLegalDocument, createLegalDocumentTranslation } from "~~/shared/dbschema/queries"
 
 export default class LegalSeed extends Seed {
   constructor() {

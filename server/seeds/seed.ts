@@ -3,7 +3,7 @@ import { Effect } from "effect"
 export default abstract class Seed {
   name: string
 
-  client = useEdgeDb().withGlobals({
+  client = useGel().withGlobals({
     server_admin: true,
   })
 
@@ -14,7 +14,7 @@ export default abstract class Seed {
   }
 
   shouldRunSeed(): Effect.Effect<boolean, Error> {
-    const { checkSeed } = useEdgeDbQueries()
+    const { checkSeed } = useGelQueries()
     return Effect.tryPromise(() => checkSeed({ seed_name: this.name })).pipe(
       Effect.map(exists => !exists),
     )
@@ -23,7 +23,7 @@ export default abstract class Seed {
   abstract seed(): Effect.Effect<void, Error>
 
   afterRunSeed(): Effect.Effect<void, Error> {
-    const { createSeed } = useEdgeDbQueries()
+    const { createSeed } = useGelQueries()
     return Effect.tryPromise(() => createSeed({ seed_name: this.name }))
   }
 }
