@@ -29,3 +29,4 @@ logs
 **/dbschema/query-builder
 **/dbschema/interfaces.ts
 **/queries/*.query.ts
+shared/dbschema/edgeql-js

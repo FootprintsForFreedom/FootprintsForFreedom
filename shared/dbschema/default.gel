@@ -1,0 +1,134 @@
+module default {
+  # scalar type Role extending enum<User, Moderator, Admin>;
+  scalar type VersionStatus extending enum<draft, pending_verification, approved, changes_requested, rejected>;
+  # scalar type MediaFileTypes extending enum<Image, Video, Audio, Document>;
+
+  abstract type HasTitle {
+    required title: str;
+    required slug: str;
+  }
+
+  abstract type HasDescriptionAndSource {
+    required description: str;
+    required source: str;
+  }
+
+  abstract type HasLanguage {
+    required language: Language;
+  }
+
+  abstract type HasLocalizedTitle extending HasTitle, HasLanguage { }
+
+  abstract type HasLocation {
+    required latitude: float64;
+    required longitude: float64;
+  }
+
+  abstract type HasStatus {
+    required status: VersionStatus {
+      default := <VersionStatus>'draft';
+    }
+    verified_by: User;
+    # change_requests := .<version_with_status[is ChangeRequest];
+  }
+
+  abstract type HasCreator {
+    created_by: User;
+  }
+
+  abstract type HasTimestamps {
+    required created: datetime {
+      rewrite insert using (datetime_of_statement());
+      readonly := true;
+    }
+    required modified: datetime {
+      rewrite insert, update using (datetime_of_statement());
+    }
+  }
+
+  type SeedStatus extending HasTimestamps {
+    required seed_name: str {
+      constraint exclusive;
+    }
+    required performed_at: datetime {
+      readonly := true;
+      rewrite insert using (datetime_of_statement());
+    }
+  }
+
+  type User extending HasTimestamps {
+    required name: str {
+      constraint exclusive;
+    }
+    required email: str {
+      constraint exclusive;
+    }
+    # required role: Role {
+    #   default := <Role>'User';
+    # }
+
+    # places := .<created_by[is PlaceVersion];
+    # media := .<created_by[is MediaVersion];
+    # change_requests := .<created_by[is ChangeRequest];
+    # verified_places := .<verified_by[is PlaceVersion];
+    # verified_media := .<verified_by[is MediaVersion];
+  }
+
+  type Language extending HasTimestamps {
+    required code: str {
+      constraint exclusive;
+    }
+    required name: str {
+      constraint exclusive;
+    }
+    required native_name: str {
+      constraint exclusive;
+    }
+    order: int16 {
+      constraint exclusive;
+    }
+  }
+
+  # type LegalDocument extending HasTitle, HasTimestamps {
+  #   translations := .<document[is LegalDocumentTranslation];
+  # }
+
+  # type LegalDocumentTranslation extending HasLocalizedTitle, HasTimestamps {
+  #   required document: LegalDocument;
+  #   required content: str;
+  # }
+
+  # type Place extending HasLocation, HasTimestamps {
+  #   versions := .<place[is PlaceVersion];
+  # }
+
+  # type PlaceVersion extending HasLocalizedTitle, HasDescriptionAndSource, HasLocation, HasStatus, HasCreator, HasTimestamps {
+  #   required place: Place;
+  # }
+
+  # type ChangeRequest extending HasCreator, HasTimestamps {
+  #   required version_with_status: HasStatus;
+  #   required reason: str;
+  #   required resolved: bool {
+  #     default := false;
+  #   }
+  # }
+
+  # type Media extending HasTimestamps {
+  #   required file: MediaFile;
+  #   required place: Place;
+  #   versions := .<media[is MediaVersion];
+  # }
+
+  # type MediaFile {
+  #   required file_path: str;
+  #   required type: MediaFileTypes;
+  #   medias := .<file[is Media];
+  #   media_versions := .<file[is MediaVersion];
+  # }
+
+  # type MediaVersion extending HasLocalizedTitle, HasDescriptionAndSource, HasStatus, HasCreator, HasTimestamps {
+  #   required media: Media;
+  #   file: MediaFile;
+  # }
+}
