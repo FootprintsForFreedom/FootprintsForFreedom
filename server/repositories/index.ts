@@ -1,3 +1,3 @@
-import { SeedStatusLayer } from "./seed-status.repository"
+import { SeedStatusRepositoryLayer } from "./seed-status.repository"
 
-export const RepositoryLayer = SeedStatusLayer
+export const RepositoryLayer = SeedStatusRepositoryLayer

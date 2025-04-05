@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm"
 import { Effect } from "effect"
 import { DatabaseLayer, type SqlError } from "../utils/drizzle"
 
-export class SeedStatus extends Effect.Service<SeedStatus>()("app/repositories/SeedStatus", {
+export class SeedStatusRepository extends Effect.Service<SeedStatusRepository>()("app/repositories/SeedStatusRepository", {
   effect: Effect.gen(function* () {
     const drizzle = yield* Drizzle
 
@@ -23,4 +23,4 @@ export class SeedStatus extends Effect.Service<SeedStatus>()("app/repositories/S
   dependencies: [DatabaseLayer],
 }) { }
 
-export const SeedStatusLayer = SeedStatus.DefaultWithoutDependencies
+export const SeedStatusRepositoryLayer = SeedStatusRepository.DefaultWithoutDependencies

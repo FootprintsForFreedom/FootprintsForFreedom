@@ -1,3 +1,3 @@
-import { SeedServiceLayer } from "./seed-status.service"
+import { SeedStatusServiceLayer } from "./seed-status.service"
 
-export const ServiceLayer = SeedServiceLayer
+export const ServiceLayer = SeedStatusServiceLayer
