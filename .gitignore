@@ -22,11 +22,3 @@ logs
 .env
 .env.*
 !.env.example
-
-# EdgeDB
-**/*.edgeql.ts
-**/dbschema/queries.*
-**/dbschema/query-builder
-**/dbschema/interfaces.ts
-**/queries/*.query.ts
-shared/dbschema/edgeql-js
