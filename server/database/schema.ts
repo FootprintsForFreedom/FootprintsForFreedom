@@ -1,5 +1,5 @@
 import { pgEnum, smallint, doublePrecision, boolean, pgTable,
-  varchar, timestamp, text, uuid } from "drizzle-orm/pg-core"
+  varchar, timestamp, text, uuid, geometry, index } from "drizzle-orm/pg-core"
 import { relations } from "drizzle-orm"
 import { user } from "./auth-schema"
 
@@ -63,13 +63,17 @@ export const legalDocumentContentRelations = relations(legalDocumentContent, ({ 
   }),
 }))
 
-export const place = pgTable("place", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  latitude: doublePrecision("latitude").notNull(),
-  longitude: doublePrecision("longitude").notNull(),
-  created: timestamp("created", { withTimezone: true }).notNull().defaultNow(),
-  modified: timestamp("modified", { withTimezone: true }).notNull().defaultNow(),
-})
+export const place = pgTable("place",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    location: geometry("location", { type: "point", mode: "xy", srid: 4326 }).notNull(),
+    created: timestamp("created", { withTimezone: true }).notNull().defaultNow(),
+    modified: timestamp("modified", { withTimezone: true }).notNull().defaultNow(),
+  },
+  t => [
+    index("spatial_index").using("gist", t.location),
+  ],
+)
 
 export const placeRelations = relations(place, ({ many }) => ({
   versions: many(placeVersion),
