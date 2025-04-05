@@ -19,6 +19,8 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
+    databaseUrl: "postgres://postgres:postgres@localhost:5432/postgres",
+    // TODO: move to smtp sub-object
     smtpSender: "noreply@test.test",
     smtpHost: "localhost",
     smtpPort: 1025,

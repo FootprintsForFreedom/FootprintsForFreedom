@@ -1,7 +1,13 @@
 import { defineConfig } from "drizzle-kit"
 
 export default defineConfig({
-  schema: "./shared/dbschema/default.gel",
-  dialect: "gel",
-  out: "./migrations",
+  dialect: "postgresql",
+  schema: [
+    "./server/database/schema.ts",
+    "./server/database/auth-schema.ts",
+  ],
+  out: "./server/database/migrations",
+  dbCredentials: {
+    url: process.env.NUXT_DATABASE_URL!,
+  },
 })

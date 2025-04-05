@@ -1,27 +1,28 @@
 import { Effect, pipe } from "effect"
-import AuthSeed from "../seeds/auth"
+// import AuthSeed from "../seeds/auth"
 import type Seed from "../seeds/seed"
-import SmtpSeed from "../seeds/smtp"
-import ConfigSeed from "../seeds/config"
-import LanguageSeed from "../seeds/language"
-import LegalSeed from "../seeds/legal"
+import type { SeedService } from "../services/seed-status.service"
+// import SmtpSeed from "../seeds/smtp"
+// import ConfigSeed from "../seeds/config"
+// import LanguageSeed from "../seeds/language"
+// import LegalSeed from "../seeds/legal"
 
 export default defineNitroPlugin(async () => {
   const seeds: Seed[] = [
-    new AuthSeed(),
-    new ConfigSeed(),
-    new SmtpSeed(),
-    new LanguageSeed(),
-    new LegalSeed(),
+    // new AuthSeed(),
+    // new ConfigSeed(),
+    // new SmtpSeed(),
+    // new LanguageSeed(),
+    // new LegalSeed(),
   ]
 
-  const executeSeed = (seed: Seed): Effect.Effect<void, Error> =>
+  const executeSeed = (seed: Seed): Effect.Effect<void, Error, SeedService> =>
     seed.seed().pipe(
       Effect.flatMap(() => seed.afterRunSeed()),
       Effect.tap(() => Effect.logInfo(`Seeded ${seed.name}`)),
     )
 
-  const checkAndSeed = (seed: Seed): Effect.Effect<boolean, Error> =>
+  const checkAndSeed = (seed: Seed): Effect.Effect<boolean, Error, SeedService> =>
     seed.shouldRunSeed().pipe(
       Effect.flatMap(shouldRunSeed => shouldRunSeed
         ? pipe(

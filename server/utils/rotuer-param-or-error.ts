@@ -8,7 +8,7 @@ export function getRouterParamOrCreateError(
   return Effect.gen(function* () {
     const param = getRouterParam(req, paramName)
     if (!param) {
-      return yield * Effect.fail(
+      return yield* Effect.fail(
         createError({ status: 400, message: `Missing ${paramName}` }),
       )
     }
