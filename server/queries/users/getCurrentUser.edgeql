@@ -1,1 +1,0 @@
-select global current_user { id, name, email, role };

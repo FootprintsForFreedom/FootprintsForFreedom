@@ -1,29 +1,25 @@
 import { Effect } from "effect"
+import { SeedService } from "../services/seed-status.service"
 
 export default abstract class Seed {
-  name: string
-
-  client = useEdgeDb().withGlobals({
-    server_admin: true,
-  })
-
   runtimeConfig = useRuntimeConfig()
 
-  constructor(name: string) {
-    this.name = name
+  constructor(public name: string) { }
+
+  shouldRunSeed(): Effect.Effect<boolean, SqlError, SeedService> {
+    return Effect.gen(function* (this: Seed) {
+      const service = yield* SeedService
+      const exists = yield* service.checkSeedExists(this.name)
+      return !exists
+    }.bind(this)) // bind(this) keeps `this.name` intact inside the generator
   }
 
-  shouldRunSeed(): Effect.Effect<boolean, Error> {
-    const { checkSeed } = useEdgeDbQueries()
-    return Effect.tryPromise(() => checkSeed({ seed_name: this.name })).pipe(
-      Effect.map(exists => !exists),
-    )
-  }
+  abstract seed(): Effect.Effect<void, Error, SeedService>
 
-  abstract seed(): Effect.Effect<void, Error>
-
-  afterRunSeed(): Effect.Effect<void, Error> {
-    const { createSeed } = useEdgeDbQueries()
-    return Effect.tryPromise(() => createSeed({ seed_name: this.name }))
+  afterRunSeed(): Effect.Effect<void, Error, SeedService> {
+    return Effect.gen(function* (this: Seed) {
+      const service = yield* SeedService
+      yield* service.createSeedRecord(this.name)
+    }.bind(this)) // bind(this) keeps `this.name` intact inside the generator
   }
 }

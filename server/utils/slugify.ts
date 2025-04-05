@@ -3,7 +3,7 @@
  * @param input The string to be slugified.
  * @returns A slugified version of the input string.
  */
-export default function slugify(input: string): string {
+export function slugify(input: string): string {
   if (!input) {
     return ""
   }

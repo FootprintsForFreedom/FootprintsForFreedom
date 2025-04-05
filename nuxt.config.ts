@@ -1,6 +1,10 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ["@nuxt/eslint", "@nuxt/ui-pro", "nuxt-edgedb-module", "@pinia/nuxt"],
+  modules: [
+    "@nuxt/eslint",
+    "@nuxt/ui-pro",
+    "@pinia/nuxt",
+  ],
 
   devtools: {
     enabled: true,
@@ -15,6 +19,8 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
+    databaseUrl: "postgres://postgres:postgres@localhost:5432/postgres",
+    // TODO: move to smtp sub-object
     smtpSender: "noreply@test.test",
     smtpHost: "localhost",
     smtpPort: 1025,
@@ -34,22 +40,13 @@ export default defineNuxtConfig({
 
   compatibilityDate: "2024-07-11",
 
-  edgeDb: {
-    devtools: true,
-    dbschemaDir: "./shared/dbschema",
-    queriesDir: "./server/queries",
-    installCli: true,
-    composables: true,
-    auth: true,
-    oauth: true,
-  },
-
   eslint: {
     config: {
       stylistic: {
         commaDangle: "always-multiline",
         braceStyle: "1tbs",
         indent: 2,
+        // TODO: remove following two lines or set to default
         quotes: "double",
         semi: false,
       },
