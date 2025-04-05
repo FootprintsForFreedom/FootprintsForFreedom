@@ -1,5 +1,5 @@
 import { pgEnum, smallint, doublePrecision, boolean, pgTable,
-  varchar, timestamp, text, uuid, geometry, index } from "drizzle-orm/pg-core"
+  varchar, timestamp, text, uuid, geometry, index, unique } from "drizzle-orm/pg-core"
 import { relations } from "drizzle-orm"
 import { user } from "./auth-schema"
 
@@ -33,6 +33,7 @@ export const languageRelations = relations(language, ({ many }) => ({
 
 export const legalDocument = pgTable("legal_documents", {
   id: uuid("id").primaryKey().defaultRandom(),
+  slug: text("slug").notNull(),
   created: timestamp("created", { withTimezone: true }).notNull().defaultNow(),
   modified: timestamp("modified", { withTimezone: true }).notNull().defaultNow(),
 })
@@ -41,16 +42,20 @@ export const legalDocumentRelations = relations(legalDocument, ({ many }) => ({
   contents: many(legalDocumentContent),
 }))
 
-export const legalDocumentContent = pgTable("legal_document_content", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  documentId: uuid("document_id").notNull().references(() => legalDocument.id),
-  languageId: uuid("language_id").notNull().references(() => language.id),
-  title: text("title").notNull(),
-  slug: text("slug").notNull(),
-  content: text("content").notNull(),
-  created: timestamp("created", { withTimezone: true }).notNull().defaultNow(),
-  modified: timestamp("modified", { withTimezone: true }).notNull().defaultNow(),
-})
+export const legalDocumentContent = pgTable("legal_document_content",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    documentId: uuid("document_id").notNull().references(() => legalDocument.id),
+    languageId: uuid("language_id").notNull().references(() => language.id),
+    title: text("title").notNull(),
+    content: text("content").notNull(),
+    created: timestamp("created", { withTimezone: true }).notNull().defaultNow(),
+    modified: timestamp("modified", { withTimezone: true }).notNull().defaultNow(),
+  },
+  t => [
+    unique("unique_document_language").on(t.documentId, t.languageId),
+  ],
+)
 
 export const legalDocumentContentRelations = relations(legalDocumentContent, ({ one }) => ({
   document: one(legalDocument, {
