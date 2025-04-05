@@ -1,19 +1,11 @@
 import { Effect, pipe } from "effect"
-// import AuthSeed from "../seeds/auth"
 import type Seed from "../seeds/seed"
 import type { SeedService } from "../services/seed-status.service"
-// import SmtpSeed from "../seeds/smtp"
-// import ConfigSeed from "../seeds/config"
-// import LanguageSeed from "../seeds/language"
-// import LegalSeed from "../seeds/legal"
 
 export default defineNitroPlugin(async () => {
   const seeds: Seed[] = [
-    // new AuthSeed(),
-    // new ConfigSeed(),
-    // new SmtpSeed(),
-    // new LanguageSeed(),
-    // new LegalSeed(),
+    // Add your seed classes here
+    // new YourSeedClass(),
   ]
 
   const executeSeed = (seed: Seed): Effect.Effect<void, Error, SeedService> =>
