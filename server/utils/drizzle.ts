@@ -27,7 +27,6 @@ export function useDrizzle() {
   return nitro._drizzleClient
 }
 
-// Custom SQL error
 export class SqlError extends Error {
   constructor(message: string) {
     super(`Drizzle query failed: ${message}`)
@@ -35,21 +34,22 @@ export class SqlError extends Error {
   }
 }
 
-// Define the service using Effect.Service
-export class Drizzle extends Effect.Service<Drizzle>()("app/Drizzle", {
-  // Define the effect that creates the service
-  effect: Effect.sync(() => {
-    const client = useDrizzle()
+export class Drizzle extends Effect.Service<Drizzle>()(
+  "app/Drizzle",
+  {
+    effect: Effect.sync(() => {
+      const client = useDrizzle()
 
-    const runQuery = <T>(query: Promise<T>): Effect.Effect<T, SqlError> =>
-      Effect.tryPromise({
-        try: () => query,
-        catch: error =>
-          new SqlError(error instanceof Error ? error.message : String(error)),
-      })
+      const runQuery = <T>(query: Promise<T>): Effect.Effect<T, SqlError> =>
+        Effect.tryPromise({
+          try: () => query,
+          catch: error =>
+            new SqlError(error instanceof Error ? error.message : String(error)),
+        })
 
-    return { client, runQuery } as const
-  }),
-}) { }
+      return { client, runQuery } as const
+    }),
+  },
+) { }
 
 export const DatabaseLayer = Drizzle.Default

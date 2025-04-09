@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:17-alpine
+    image: ghcr.io/baosystems/postgis:15-3.5 # use unofficial image until official image is available
     container_name: footprints_dev_db
     restart: unless-stopped
     env_file:

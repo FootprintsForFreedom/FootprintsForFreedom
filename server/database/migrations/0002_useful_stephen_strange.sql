@@ -1,1 +1,0 @@
-CREATE INDEX "spatial_index" ON "place" USING gist ("location");

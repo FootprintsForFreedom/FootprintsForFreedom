@@ -1,5 +1,5 @@
 import { pgEnum, smallint, doublePrecision, boolean, pgTable,
-  varchar, timestamp, text, uuid, geometry, index } from "drizzle-orm/pg-core"
+  varchar, timestamp, text, uuid, geometry, index, unique } from "drizzle-orm/pg-core"
 import { relations } from "drizzle-orm"
 import { user } from "./auth-schema"
 
@@ -20,10 +20,13 @@ export const language = pgTable("language", {
   code: text("code").notNull().unique(),
   name: text("name").notNull().unique(),
   native_name: text("native_name").notNull().unique(),
-  order: smallint("order").unique(),
+  order: smallint("order").notNull().unique(),
   created: timestamp("created", { withTimezone: true }).notNull().defaultNow(),
   modified: timestamp("modified", { withTimezone: true }).notNull().defaultNow(),
 })
+
+export type Language = typeof language.$inferSelect
+export type LanguageInsert = typeof language.$inferInsert
 
 export const languageRelations = relations(language, ({ many }) => ({
   legalDocumentContents: many(legalDocumentContent),
@@ -33,6 +36,7 @@ export const languageRelations = relations(language, ({ many }) => ({
 
 export const legalDocument = pgTable("legal_documents", {
   id: uuid("id").primaryKey().defaultRandom(),
+  slug: text("slug").notNull(),
   created: timestamp("created", { withTimezone: true }).notNull().defaultNow(),
   modified: timestamp("modified", { withTimezone: true }).notNull().defaultNow(),
 })
@@ -41,16 +45,20 @@ export const legalDocumentRelations = relations(legalDocument, ({ many }) => ({
   contents: many(legalDocumentContent),
 }))
 
-export const legalDocumentContent = pgTable("legal_document_content", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  documentId: uuid("document_id").notNull().references(() => legalDocument.id),
-  languageId: uuid("language_id").notNull().references(() => language.id),
-  title: text("title").notNull(),
-  slug: text("slug").notNull(),
-  content: text("content").notNull(),
-  created: timestamp("created", { withTimezone: true }).notNull().defaultNow(),
-  modified: timestamp("modified", { withTimezone: true }).notNull().defaultNow(),
-})
+export const legalDocumentContent = pgTable("legal_document_content",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    documentId: uuid("document_id").notNull().references(() => legalDocument.id),
+    languageId: uuid("language_id").notNull().references(() => language.id),
+    title: text("title").notNull(),
+    content: text("content").notNull(),
+    created: timestamp("created", { withTimezone: true }).notNull().defaultNow(),
+    modified: timestamp("modified", { withTimezone: true }).notNull().defaultNow(),
+  },
+  t => [
+    unique("unique_document_language").on(t.documentId, t.languageId),
+  ],
+)
 
 export const legalDocumentContentRelations = relations(legalDocumentContent, ({ one }) => ({
   document: one(legalDocument, {
@@ -91,8 +99,8 @@ export const placeVersion = pgTable("place_version", {
   latitude: doublePrecision("latitude").notNull(),
   longitude: doublePrecision("longitude").notNull(),
   status: versionStatusEnum("status").notNull().default("draft"),
-  verifiedById: uuid("verified_by_id").references(() => user.id),
-  createdById: uuid("created_by_id").references(() => user.id),
+  verifiedById: text("verified_by_id").references(() => user.id),
+  createdById: text("created_by_id").references(() => user.id),
   created: timestamp("created", { withTimezone: true }).notNull().defaultNow(),
   modified: timestamp("modified", { withTimezone: true }).notNull().defaultNow(),
 })
@@ -158,8 +166,8 @@ export const mediaVersion = pgTable("media_version", {
   description: text("description").notNull(),
   source: text("source").notNull(),
   status: versionStatusEnum("status").notNull().default("draft"),
-  verifiedById: uuid("verified_by_id").references(() => user.id),
-  createdById: uuid("created_by_id").references(() => user.id),
+  verifiedById: text("verified_by_id").references(() => user.id),
+  createdById: text("created_by_id").references(() => user.id),
   created: timestamp("created", { withTimezone: true }).notNull().defaultNow(),
   modified: timestamp("modified", { withTimezone: true }).notNull().defaultNow(),
 })
@@ -192,7 +200,7 @@ export const changeRequest = pgTable("change_request", {
   id: uuid("id").primaryKey().defaultRandom(),
   reason: text("reason").notNull(),
   resolved: boolean("resolved").notNull().default(false),
-  createdById: uuid("created_by_id").references(() => user.id),
+  createdById: text("created_by_id").references(() => user.id),
   created: timestamp("created", { withTimezone: true }).notNull().defaultNow(),
   modified: timestamp("modified", { withTimezone: true }).notNull().defaultNow(),
 })

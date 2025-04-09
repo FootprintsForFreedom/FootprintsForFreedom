@@ -5,7 +5,7 @@ CREATE TABLE "change_request" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"reason" text NOT NULL,
 	"resolved" boolean DEFAULT false NOT NULL,
-	"created_by_id" uuid,
+	"created_by_id" text,
 	"created" timestamp with time zone DEFAULT now() NOT NULL,
 	"modified" timestamp with time zone DEFAULT now() NOT NULL
 );
@@ -15,7 +15,7 @@ CREATE TABLE "language" (
 	"code" text NOT NULL,
 	"name" text NOT NULL,
 	"native_name" text NOT NULL,
-	"order" smallint,
+	"order" smallint NOT NULL,
 	"created" timestamp with time zone DEFAULT now() NOT NULL,
 	"modified" timestamp with time zone DEFAULT now() NOT NULL,
 	CONSTRAINT "language_code_unique" UNIQUE("code"),
@@ -26,6 +26,7 @@ CREATE TABLE "language" (
 --> statement-breakpoint
 CREATE TABLE "legal_documents" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"slug" text NOT NULL,
 	"created" timestamp with time zone DEFAULT now() NOT NULL,
 	"modified" timestamp with time zone DEFAULT now() NOT NULL
 );
@@ -35,10 +36,10 @@ CREATE TABLE "legal_document_content" (
 	"document_id" uuid NOT NULL,
 	"language_id" uuid NOT NULL,
 	"title" text NOT NULL,
-	"slug" text NOT NULL,
 	"content" text NOT NULL,
 	"created" timestamp with time zone DEFAULT now() NOT NULL,
-	"modified" timestamp with time zone DEFAULT now() NOT NULL
+	"modified" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "unique_document_language" UNIQUE("document_id","language_id")
 );
 --> statement-breakpoint
 CREATE TABLE "media" (
@@ -65,8 +66,8 @@ CREATE TABLE "media_version" (
 	"description" text NOT NULL,
 	"source" text NOT NULL,
 	"status" "version_status" DEFAULT 'draft' NOT NULL,
-	"verified_by_id" uuid,
-	"created_by_id" uuid,
+	"verified_by_id" text,
+	"created_by_id" text,
 	"created" timestamp with time zone DEFAULT now() NOT NULL,
 	"modified" timestamp with time zone DEFAULT now() NOT NULL
 );
@@ -95,8 +96,8 @@ CREATE TABLE "place_version" (
 	"latitude" double precision NOT NULL,
 	"longitude" double precision NOT NULL,
 	"status" "version_status" DEFAULT 'draft' NOT NULL,
-	"verified_by_id" uuid,
-	"created_by_id" uuid,
+	"verified_by_id" text,
+	"created_by_id" text,
 	"created" timestamp with time zone DEFAULT now() NOT NULL,
 	"modified" timestamp with time zone DEFAULT now() NOT NULL
 );
@@ -140,6 +141,7 @@ CREATE TABLE "session" (
 	"ip_address" text,
 	"user_agent" text,
 	"user_id" text NOT NULL,
+	"impersonated_by" text,
 	CONSTRAINT "session_token_unique" UNIQUE("token")
 );
 --> statement-breakpoint
@@ -151,6 +153,10 @@ CREATE TABLE "user" (
 	"image" text,
 	"created_at" timestamp NOT NULL,
 	"updated_at" timestamp NOT NULL,
+	"role" text,
+	"banned" boolean,
+	"ban_reason" text,
+	"ban_expires" timestamp,
 	CONSTRAINT "user_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint
@@ -182,4 +188,5 @@ ALTER TABLE "place_version" ADD CONSTRAINT "place_version_created_by_id_user_id_
 ALTER TABLE "place_version_change_requests" ADD CONSTRAINT "place_version_change_requests_change_request_id_change_request_id_fk" FOREIGN KEY ("change_request_id") REFERENCES "public"."change_request"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "place_version_change_requests" ADD CONSTRAINT "place_version_change_requests_place_version_id_place_version_id_fk" FOREIGN KEY ("place_version_id") REFERENCES "public"."place_version"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "account" ADD CONSTRAINT "account_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "session" ADD CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;
+ALTER TABLE "session" ADD CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+CREATE INDEX "spatial_index" ON "place" USING gist ("location");

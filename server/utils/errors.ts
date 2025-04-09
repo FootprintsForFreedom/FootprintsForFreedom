@@ -8,10 +8,6 @@ export class DatabaseTypeError extends Data.TaggedError("DatabaseTypeError")<{
   message: string
 }> {}
 
-export class UserNotFoundError extends Data.TaggedError("UserNotFoundError")<{
-  id: string
-}> {}
+export class NoSessionAvailableError extends Data.TaggedError("NoSessionAvailableError") {}
 
-export class UnauthorizedError extends Data.TaggedError("UnauthorizedError")<{
-  path: string
-}> {}
+export class UnauthorizedError extends Data.TaggedError("UnauthorizedError") {}
