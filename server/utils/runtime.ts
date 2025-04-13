@@ -3,12 +3,13 @@ import { RepositoryLayer } from "../repositories"
 import { ServiceLayer } from "../services"
 import { LanguageRepositoryLayer } from "../repositories/language.repository"
 import { AuthorizationServiceLayer } from "../services/authorization.service"
+import { LanguageServiceLayer } from "../services/language.service"
 
 export const MainLayer = Layer.mergeAll(
   Logger.pretty,
   DatabaseLayer,
   RepositoryLayer.pipe(Layer.provide(DatabaseLayer)),
-  ServiceLayer.pipe(Layer.provide(RepositoryLayer), Layer.provide(LanguageRepositoryLayer), Layer.provide(AuthorizationServiceLayer), Layer.provide(DatabaseLayer)),
+  ServiceLayer.pipe(Layer.provide(RepositoryLayer), Layer.provide(LanguageServiceLayer), Layer.provide(LanguageRepositoryLayer), Layer.provide(AuthorizationServiceLayer), Layer.provide(DatabaseLayer)),
 )
 
 export const RuntimeClient = ManagedRuntime.make(MainLayer)

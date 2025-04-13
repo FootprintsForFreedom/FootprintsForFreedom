@@ -1,5 +1,6 @@
 import { Effect, Layer, pipe } from "effect"
 import LanguageSeed from "~~/server/seeds/language"
+import LegalDocumentSeed from "~~/server/seeds/legal-document"
 import type Seed from "~~/server/seeds/seed"
 import type { HttpRequestHeaders } from "~~/server/services/current-user.service"
 import { makeHttpRequestHeadersLayer } from "~~/server/services/current-user.service"
@@ -13,6 +14,7 @@ export default defineTask({
   run: async () => {
     const seeds: Seed[] = [
       new LanguageSeed(),
+      new LegalDocumentSeed(),
     ]
 
     const executeSeed = (seed: Seed): Effect.Effect<void, Error, MainLayerRequirements | HttpRequestHeaders> =>

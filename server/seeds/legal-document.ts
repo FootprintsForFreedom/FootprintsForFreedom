@@ -3,7 +3,7 @@ import { LegalDocumentService } from "../services/legal-document.service"
 import type { CurrentUserService, HttpRequestHeaders } from "../services/current-user.service"
 import Seed from "./seed"
 
-export default class LegalSeed extends Seed {
+export default class LegalDocumentSeed extends Seed {
   constructor() {
     super("legal")
   }
@@ -13,28 +13,26 @@ export default class LegalSeed extends Seed {
       title: "Terms of Service",
       slug: "terms-of-service",
       content: "This is the terms of service",
+      languageCode: "en",
     },
     {
       title: "Privacy Policy",
       slug: "privacy-policy",
       content: "This is the privacy policy",
+      languageCode: "en",
     },
     {
       title: "Imprint",
       slug: "imprint",
       content: "This is the imprint",
+      languageCode: "en",
     },
   ]
 
-  createLegalDocument(document: { title: string, slug: string, content: string }): Effect.Effect<void, Error, LegalDocumentService | CurrentUserService | HttpRequestHeaders> {
+  createLegalDocument(document: { title: string, slug: string, content: string, languageCode: string }): Effect.Effect<void, Error, LegalDocumentService | CurrentUserService | HttpRequestHeaders> {
     const effect = Effect.gen(function* () {
       const legalDocumentService = yield* LegalDocumentService
-      yield* legalDocumentService.createLegalDocument({
-        title: document.title,
-        slug: document.slug,
-        content: document.content,
-        languageId: "en",
-      })
+      yield* legalDocumentService.createLegalDocumentWithLanguageCode(document)
     })
     return effect
   }
