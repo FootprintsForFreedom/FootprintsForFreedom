@@ -25,7 +25,10 @@ export class LegalDocumentService extends Effect.Service<LegalDocumentService>()
               ...newValue,
               documentId: document[0].id,
             })
-            return { ...document, content }
+            return {
+              ...document[0],
+              content: content[0],
+            }
           }),
         )
 
