@@ -26,4 +26,4 @@ export class SeedStatusRepository extends Effect.Service<SeedStatusRepository>()
   },
 ) { }
 
-export const SeedStatusRepositoryLayer = SeedStatusRepository.DefaultWithoutDependencies
+export const SeedStatusRepositoryLayer = SeedStatusRepository.Default

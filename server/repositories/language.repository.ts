@@ -18,11 +18,14 @@ export class LanguageRepository extends Effect.Service<LanguageRepository>()(
           )
           const languageCount = languageCountResult[0]?.count ?? 0
 
-          return drizzle.runQuery(
-            drizzle.client.insert(tables.language).values({
-              ...newValue,
-              order: languageCount + 1,
-            }),
+          return yield* drizzle.runQuery(
+            drizzle.client
+              .insert(tables.language)
+              .values({
+                ...newValue,
+                order: languageCount + 1,
+              })
+              .returning(),
           )
         })
 
@@ -58,4 +61,4 @@ export class LanguageRepository extends Effect.Service<LanguageRepository>()(
   },
 ) { }
 
-export const LanguageRepositoryLayer = LanguageRepository.DefaultWithoutDependencies
+export const LanguageRepositoryLayer = LanguageRepository.Default

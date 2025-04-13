@@ -12,9 +12,16 @@ export class AuthorizationService extends Effect.Service<AuthorizationService>()
         })
       const canViewLanguages = (_user: Option.Option<User>) => true // Everyone can view
 
+      const canCreateLegalDocument = (user: Option.Option<User>) =>
+        Option.match(user, {
+          onNone: () => false,
+          onSome: u => u.role === "admin",
+        })
+
       return {
         canCreateLanguage,
         canViewLanguages,
+        canCreateLegalDocument,
       } as const
     }),
   },

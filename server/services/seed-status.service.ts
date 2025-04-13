@@ -16,4 +16,4 @@ export class SeedStatusService extends Effect.Service<SeedStatusService>()(
   },
 ) { }
 
-export const SeedStatusServiceLayer = SeedStatusService.DefaultWithoutDependencies
+export const SeedStatusServiceLayer = SeedStatusService.Default

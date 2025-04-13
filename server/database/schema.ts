@@ -41,6 +41,9 @@ export const legalDocument = pgTable("legal_documents", {
   modified: timestamp("modified", { withTimezone: true }).notNull().defaultNow(),
 })
 
+export type LegalDocument = typeof legalDocument.$inferSelect
+export type LegalDocumentInsert = typeof legalDocument.$inferInsert
+
 export const legalDocumentRelations = relations(legalDocument, ({ many }) => ({
   contents: many(legalDocumentContent),
 }))
@@ -59,6 +62,9 @@ export const legalDocumentContent = pgTable("legal_document_content",
     unique("unique_document_language").on(t.documentId, t.languageId),
   ],
 )
+
+export type LegalDocumentContent = typeof legalDocumentContent.$inferSelect
+export type LegalDocumentContentInsert = typeof legalDocumentContent.$inferInsert
 
 export const legalDocumentContentRelations = relations(legalDocumentContent, ({ one }) => ({
   document: one(legalDocument, {

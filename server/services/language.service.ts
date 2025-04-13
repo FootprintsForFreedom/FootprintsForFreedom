@@ -1,7 +1,7 @@
 import { Effect } from "effect"
 import { LanguageRepository, LanguageRepositoryLayer } from "../repositories/language.repository"
 import type { LanguageInsert } from "../database/schema"
-import { AuthorizationService } from "./authorization.service"
+import { AuthorizationService, AuthorizationServiceLayer } from "./authorization.service"
 
 export class LanguageService extends Effect.Service<LanguageService>()(
   "app/services/LanguageService",
@@ -13,7 +13,15 @@ export class LanguageService extends Effect.Service<LanguageService>()(
       const createLanguage = (newValue: Omit<LanguageInsert, "order">) =>
         authorize(
           user => auth.canCreateLanguage(user),
-          repo.createLanguage(newValue),
+          Effect.gen(function* () {
+            const languageExists = yield* repo.getLanguageByCode(newValue.code)
+            if (languageExists) {
+              throw new AlreadyExistsError({
+                message: `Language with code ${newValue.code} already exists`,
+              })
+            }
+            return yield* repo.createLanguage(newValue)
+          }),
         )
       const getAllLanguages = () =>
         authorize(
@@ -38,8 +46,8 @@ export class LanguageService extends Effect.Service<LanguageService>()(
         getLanguageById,
       } as const
     }),
-    dependencies: [LanguageRepositoryLayer],
+    dependencies: [LanguageRepositoryLayer, AuthorizationServiceLayer],
   },
 ) { }
 
-export const LanguageServiceLayer = LanguageService.DefaultWithoutDependencies
+export const LanguageServiceLayer = LanguageService.Default
