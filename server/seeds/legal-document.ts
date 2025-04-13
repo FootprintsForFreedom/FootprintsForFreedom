@@ -11,13 +11,13 @@ export default class LegalDocumentSeed extends Seed {
   private legalDocuments = [
     {
       title: "Terms of Service",
-      slug: "terms-of-service",
+      slug: "terms",
       content: "This is the terms of service",
       languageCode: "en",
     },
     {
       title: "Privacy Policy",
-      slug: "privacy-policy",
+      slug: "privacy",
       content: "This is the privacy policy",
       languageCode: "en",
     },
