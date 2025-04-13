@@ -71,4 +71,4 @@ export class LegalDocumentService extends Effect.Service<LegalDocumentService>()
   },
 ) { }
 
-export const LegalDocumentServiceLayer = LegalDocumentService.DefaultWithoutDependencies
+export const LegalDocumentServiceLayer = LegalDocumentService.Default

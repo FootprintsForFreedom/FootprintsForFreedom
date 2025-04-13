@@ -111,4 +111,4 @@ export class LegalDocumentRepository extends Effect.Service<LegalDocumentReposit
   },
 ) { }
 
-export const LegalDocumentRepositoryLayer = LegalDocumentRepository.DefaultWithoutDependencies
+export const LegalDocumentRepositoryLayer = LegalDocumentRepository.Default

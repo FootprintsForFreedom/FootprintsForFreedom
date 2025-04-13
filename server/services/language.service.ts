@@ -50,4 +50,4 @@ export class LanguageService extends Effect.Service<LanguageService>()(
   },
 ) { }
 
-export const LanguageServiceLayer = LanguageService.DefaultWithoutDependencies
+export const LanguageServiceLayer = LanguageService.Default

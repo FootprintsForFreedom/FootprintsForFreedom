@@ -61,4 +61,4 @@ export class LanguageRepository extends Effect.Service<LanguageRepository>()(
   },
 ) { }
 
-export const LanguageRepositoryLayer = LanguageRepository.DefaultWithoutDependencies
+export const LanguageRepositoryLayer = LanguageRepository.Default
