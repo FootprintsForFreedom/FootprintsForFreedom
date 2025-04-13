@@ -1,4 +1,4 @@
-import { Effect } from "effect"
+import { Effect, Either } from "effect"
 import { LegalDocumentRepository, LegalDocumentRepositoryLayer } from "../repositories/legal-document.repository"
 import type { LegalDocumentContentInsert, LegalDocumentInsert } from "../database/schema"
 import { AuthorizationService, AuthorizationServiceLayer } from "./authorization.service"
@@ -14,8 +14,8 @@ export class LegalDocumentService extends Effect.Service<LegalDocumentService>()
 
       const _createLegalDocument = (newValue: LegalDocumentInsert & Omit<LegalDocumentContentInsert, "documentId">) =>
         Effect.gen(function* () {
-          const documentExists = yield* repo.getLegalDocumentBySlug(newValue.slug)
-          if (documentExists) {
+          const documentExists = yield* Effect.either(repo.getLegalDocumentBySlug(newValue.slug))
+          if (Either.isRight(documentExists)) {
             throw new AlreadyExistsError({
               message: `Legal document with slug ${newValue.slug} already exists`,
             })

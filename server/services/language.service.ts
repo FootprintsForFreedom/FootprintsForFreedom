@@ -1,4 +1,4 @@
-import { Effect } from "effect"
+import { Effect, Either } from "effect"
 import { LanguageRepository, LanguageRepositoryLayer } from "../repositories/language.repository"
 import type { LanguageInsert } from "../database/schema"
 import { AuthorizationService, AuthorizationServiceLayer } from "./authorization.service"
@@ -14,8 +14,8 @@ export class LanguageService extends Effect.Service<LanguageService>()(
         authorize(
           user => auth.canCreateLanguage(user),
           Effect.gen(function* () {
-            const languageExists = yield* repo.getLanguageByCode(newValue.code)
-            if (languageExists) {
+            const languageExists = yield* Effect.either(repo.getLanguageByCode(newValue.code))
+            if (Either.isRight(languageExists)) {
               throw new AlreadyExistsError({
                 message: `Language with code "${newValue.code}" already exists`,
               })
