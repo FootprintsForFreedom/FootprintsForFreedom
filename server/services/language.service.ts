@@ -17,7 +17,7 @@ export class LanguageService extends Effect.Service<LanguageService>()(
             const languageExists = yield* repo.getLanguageByCode(newValue.code)
             if (languageExists) {
               throw new AlreadyExistsError({
-                message: `Language with code ${newValue.code} already exists`,
+                message: `Language with code "${newValue.code}" already exists`,
               })
             }
             return yield* repo.createLanguage(newValue)

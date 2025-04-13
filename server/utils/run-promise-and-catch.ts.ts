@@ -1,8 +1,9 @@
 import { Effect } from "effect"
 import { H3Error } from "h3"
+import type { MainLayerRequirements } from "./runtime"
 
 export async function runPromiseAndCatch<T>(
-  handler: Effect.Effect<T, Error>,
+  handler: Effect.Effect<T, Error, MainLayerRequirements>,
   name: string,
 ) {
   const main = handler.pipe(

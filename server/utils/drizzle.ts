@@ -27,13 +27,6 @@ export function useDrizzle() {
   return nitro._drizzleClient
 }
 
-export class SqlError extends Error {
-  constructor(message: string) {
-    super(`Drizzle query failed: ${message}`)
-    this.name = "SqlError"
-  }
-}
-
 export class Drizzle extends Effect.Service<Drizzle>()(
   "app/Drizzle",
   {
@@ -44,10 +37,31 @@ export class Drizzle extends Effect.Service<Drizzle>()(
         Effect.tryPromise({
           try: () => query,
           catch: error =>
-            new SqlError(error instanceof Error ? error.message : String(error)),
+            new SqlError({
+              message: error instanceof Error ? error.message : String(error),
+            }),
         })
 
-      return { client, runQuery } as const
+      const runQueryOrNotFound = <T>(
+        query: Promise<T | undefined | null>,
+        options?: { message?: string },
+      ): Effect.Effect<T, SqlError | NotFoundError> =>
+        Effect.flatMap(runQuery(query), (result) => {
+          if (result == null || (Array.isArray(result) && result.length === 0)) {
+            return Effect.fail(
+              new NotFoundError({
+                message: options?.message ?? "Item not found",
+              }),
+            )
+          }
+          return Effect.succeed(result)
+        })
+
+      return {
+        client,
+        runQuery,
+        runQueryOrNotFound,
+      } as const
     }),
   },
 ) { }

@@ -18,10 +18,13 @@ export class AuthorizationService extends Effect.Service<AuthorizationService>()
           onSome: u => u.role === "admin",
         })
 
+      const canViewLegalDocument = (_user: Option.Option<User>) => true // Everyone can view
+
       return {
         canCreateLanguage,
         canViewLanguages,
         canCreateLegalDocument,
+        canViewLegalDocument,
       } as const
     }),
   },

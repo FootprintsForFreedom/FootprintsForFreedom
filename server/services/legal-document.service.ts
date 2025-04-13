@@ -47,24 +47,33 @@ export class LegalDocumentService extends Effect.Service<LegalDocumentService>()
       ) =>
         authorize(
           user => auth.canCreateLegalDocument(user),
-          Effect.gen(function* () {
-            const language = yield* languageService.getLanguageByCode(newValue.languageCode)
-            if (!language) {
-              throw new NotFoundError({
-                message: `Language with code ${newValue.languageCode} not found`,
-              })
-            }
+          Effect.flatMap(
+            languageService.getLanguageByCode(newValue.languageCode),
+            language =>
+              _createLegalDocument({
+                ...newValue,
+                languageId: language.id,
+              }),
+          ),
+        )
 
-            return yield* _createLegalDocument({
-              ...newValue,
-              languageId: language.id,
-            })
-          }),
+      const getLegalDocumentBySlugForLanguageCode = (
+        slug: string,
+        languageCode: string,
+      ) =>
+        authorize(
+          user => auth.canViewLegalDocument(user),
+          Effect.flatMap(
+            languageService.getLanguageByCode(languageCode),
+            language =>
+              repo.getLegalDocumentContentBySlugAndLanguageId(slug, language.id),
+          ),
         )
 
       return {
         createLegalDocument,
         createLegalDocumentWithLanguageCode,
+        getLegalDocumentBySlugForLanguageCode,
       } as const
     }),
     dependencies: [LegalDocumentRepositoryLayer, AuthorizationServiceLayer, LanguageServiceLayer],
