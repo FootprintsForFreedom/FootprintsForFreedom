@@ -22,7 +22,7 @@ export function getQueryParamOrCreateError<T>(
   parse: (raw: string) => T,
   { defaultValue }: { defaultValue?: T } = {},
 ): Effect.Effect<T, MissingParameterError> {
-  const test = Effect.try({
+  return Effect.try({
     try: () => {
       const param = getQuery(req)[paramName] as string | undefined
       if (!param) {
@@ -41,5 +41,4 @@ export function getQueryParamOrCreateError<T>(
         ? err
         : new MissingParameterError({ message: "Unknown error" }),
   })
-  return test
 }
