@@ -2,15 +2,15 @@
 const items = [
   {
     label: "Imprint",
-    to: "/imprint",
+    to: "/legal/imprint",
   },
   {
     label: "Privacy Policy",
-    to: "/privacy",
+    to: "/legal/privacy",
   },
   {
     label: "Terms of Service",
-    to: "/terms",
+    to: "/legal/terms",
   },
 ]
 </script>

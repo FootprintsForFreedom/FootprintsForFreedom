@@ -1,4 +1,4 @@
-import { Effect } from "effect"
+import { Effect, Either, pipe } from "effect"
 import { LegalDocumentRepository, LegalDocumentRepositoryLayer } from "../repositories/legal-document.repository"
 import type { LegalDocumentContentInsert, LegalDocumentInsert } from "../database/schema"
 import { AuthorizationService, AuthorizationServiceLayer } from "./authorization.service"
@@ -14,8 +14,8 @@ export class LegalDocumentService extends Effect.Service<LegalDocumentService>()
 
       const _createLegalDocument = (newValue: LegalDocumentInsert & Omit<LegalDocumentContentInsert, "documentId">) =>
         Effect.gen(function* () {
-          const documentExists = yield* repo.getLegalDocumentBySlug(newValue.slug)
-          if (documentExists) {
+          const documentExists = yield* Effect.either(repo.getLegalDocumentBySlug(newValue.slug))
+          if (Either.isRight(documentExists)) {
             throw new AlreadyExistsError({
               message: `Legal document with slug ${newValue.slug} already exists`,
             })
@@ -47,24 +47,36 @@ export class LegalDocumentService extends Effect.Service<LegalDocumentService>()
       ) =>
         authorize(
           user => auth.canCreateLegalDocument(user),
-          Effect.gen(function* () {
-            const language = yield* languageService.getLanguageByCode(newValue.languageCode)
-            if (!language) {
-              throw new NotFoundError({
-                message: `Language with code ${newValue.languageCode} not found`,
-              })
-            }
+          Effect.flatMap(
+            languageService.getLanguageByCode(newValue.languageCode),
+            language =>
+              _createLegalDocument({
+                ...newValue,
+                languageId: language.id,
+              }),
+          ),
+        )
 
-            return yield* _createLegalDocument({
-              ...newValue,
-              languageId: language.id,
-            })
-          }),
+      const getLegalDocumentBySlugForLanguageCode = (
+        slug: string,
+        languageCode: string,
+      ) =>
+        authorize(
+          user => auth.canViewLegalDocument(user),
+          pipe(
+            Effect.flatMap(
+              languageService.getLanguageByCode(languageCode),
+              language =>
+                repo.getLegalDocumentContentBySlugAndLanguageId(slug, language.id),
+            ),
+            Effect.map(legalDocument => legalDocument[0]),
+          ),
         )
 
       return {
         createLegalDocument,
         createLegalDocumentWithLanguageCode,
+        getLegalDocumentBySlugForLanguageCode,
       } as const
     }),
     dependencies: [LegalDocumentRepositoryLayer, AuthorizationServiceLayer, LanguageServiceLayer],

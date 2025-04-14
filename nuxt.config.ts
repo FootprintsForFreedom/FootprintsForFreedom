@@ -4,6 +4,7 @@ export default defineNuxtConfig({
     "@nuxt/eslint",
     "@nuxt/ui-pro",
     "@pinia/nuxt",
+    "@nuxtjs/mdc",
   ],
 
   devtools: {

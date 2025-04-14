@@ -37,17 +37,19 @@ export class LanguageRepository extends Effect.Service<LanguageRepository>()(
         )
 
       const getLanguageByCode = (code: string) =>
-        drizzle.runQuery(
+        drizzle.runQueryOrNotFound(
           drizzle.client.query.language.findFirst({
             where: eq(tables.language.code, code),
           }),
+          { message: `Language with code "${code}" not found` },
         )
 
       const getLanguageById = (id: string) =>
-        drizzle.runQuery(
+        drizzle.runQueryOrNotFound(
           drizzle.client.query.language.findFirst({
             where: eq(tables.language.id, id),
           }),
+          { message: `Language with id "${id}" not found` },
         )
 
       return {

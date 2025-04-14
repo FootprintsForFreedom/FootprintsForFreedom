@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm"
 import { Effect } from "effect"
-import { DatabaseLayer, type SqlError } from "../utils/drizzle"
+import { DatabaseLayer } from "../utils/drizzle"
 
 export class SeedStatusRepository extends Effect.Service<SeedStatusRepository>()(
   "app/repositories/SeedStatusRepository",

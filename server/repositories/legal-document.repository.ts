@@ -25,31 +25,34 @@ export class LegalDocumentRepository extends Effect.Service<LegalDocumentReposit
         )
 
       const getLegalDocumentBySlug = (slug: string) =>
-        drizzle.runQuery(
+        drizzle.runQueryOrNotFound(
           drizzle.client.query.legalDocument.findFirst({
             where: eq(tables.legalDocument.slug, slug),
           }),
+          { message: `Legal document with slug ${slug} not found` },
         )
 
       const getLegalDocumentById = (id: string) =>
-        drizzle.runQuery(
+        drizzle.runQueryOrNotFound(
           drizzle.client.query.legalDocument.findFirst({
             where: eq(tables.legalDocument.id, id),
           }),
+          { message: `Legal document with id ${id} not found` },
         )
 
       const getLegalDocumentContentById = (id: string) =>
-        drizzle.runQuery(
+        drizzle.runQueryOrNotFound(
           drizzle.client.query.legalDocumentContent.findFirst({
             where: eq(tables.legalDocumentContent.id, id),
           }),
+          { message: `Legal document content with id ${id} not found` },
         )
 
       const getLegalDocumentContentBySlugAndLanguageId = (
         slug: string,
         languageId: string,
       ) =>
-        drizzle.runQuery(
+        drizzle.runQueryOrNotFound(
           drizzle.client
             .select({
               ...getTableColumns(tables.legalDocumentContent),
@@ -66,14 +69,16 @@ export class LegalDocumentRepository extends Effect.Service<LegalDocumentReposit
                 eq(tables.legalDocumentContent.languageId, languageId),
               ),
             )
-            .limit(1),
+            .limit(1)
+            .execute(),
+          { message: `Legal document content with slug ${slug} and languageId ${languageId} not found` },
         )
 
       const getLegalDocumentContentBySlugAndLanguageCode = (
         slug: string,
         languageCode: string,
       ) =>
-        drizzle.runQuery(
+        drizzle.runQueryOrNotFound(
           drizzle.client
             .select({
               ...getTableColumns(tables.legalDocumentContent),
@@ -95,6 +100,7 @@ export class LegalDocumentRepository extends Effect.Service<LegalDocumentReposit
               ),
             )
             .limit(1),
+          { message: `Legal document content with slug ${slug} and languageCode ${languageCode} not found` },
         )
 
       return {
