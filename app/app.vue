@@ -30,6 +30,8 @@ await callOnce(async () => {
 
 <template>
   <UApp>
+    <NuxtLoadingIndicator />
+
     <WebsiteHeader />
 
     <UMain>

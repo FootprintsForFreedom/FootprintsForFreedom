@@ -1,4 +1,4 @@
-import { Effect, Either } from "effect"
+import { Effect, Either, pipe } from "effect"
 import { LegalDocumentRepository, LegalDocumentRepositoryLayer } from "../repositories/legal-document.repository"
 import type { LegalDocumentContentInsert, LegalDocumentInsert } from "../database/schema"
 import { AuthorizationService, AuthorizationServiceLayer } from "./authorization.service"
@@ -63,10 +63,13 @@ export class LegalDocumentService extends Effect.Service<LegalDocumentService>()
       ) =>
         authorize(
           user => auth.canViewLegalDocument(user),
-          Effect.flatMap(
-            languageService.getLanguageByCode(languageCode),
-            language =>
-              repo.getLegalDocumentContentBySlugAndLanguageId(slug, language.id),
+          pipe(
+            Effect.flatMap(
+              languageService.getLanguageByCode(languageCode),
+              language =>
+                repo.getLegalDocumentContentBySlugAndLanguageId(slug, language.id),
+            ),
+            Effect.map(legalDocument => legalDocument[0]),
           ),
         )
 
