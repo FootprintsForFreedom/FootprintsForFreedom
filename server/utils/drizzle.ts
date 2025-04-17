@@ -3,13 +3,6 @@ import { drizzle } from "drizzle-orm/node-postgres"
 import * as authSchema from "../database/auth-schema"
 import * as schema from "../database/schema"
 
-// Extend the NitroApp type to include _drizzleClient
-declare module "nitropack" {
-  interface NitroApp {
-    _drizzleClient?: ReturnType<typeof drizzle<typeof tables>>
-  }
-}
-
 export const tables = {
   ...schema,
   ...authSchema,
@@ -17,21 +10,13 @@ export const tables = {
 
 const { databaseUrl } = useRuntimeConfig()
 
-export function useDrizzle() {
-  const nitro = useNitroApp()
-
-  if (!nitro._drizzleClient) {
-    nitro._drizzleClient = drizzle<typeof tables>(databaseUrl, { schema: tables })
-  }
-
-  return nitro._drizzleClient
-}
+export const dbClient = drizzle<typeof tables>(databaseUrl, { schema: tables })
 
 export class Drizzle extends Effect.Service<Drizzle>()(
   "app/Drizzle",
   {
     effect: Effect.sync(() => {
-      const client = useDrizzle()
+      const client = dbClient
 
       const runQuery = <T>(query: Promise<T>): Effect.Effect<T, SqlError> =>
         Effect.tryPromise({

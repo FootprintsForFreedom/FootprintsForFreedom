@@ -21,6 +21,12 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     databaseUrl: "postgres://postgres:postgres@localhost:5432/postgres",
+    passkey: {
+      rpID: "localhost",
+      rpName: "Footprints4Freedom",
+      origin: "http://localhost:3000",
+      userVerification: "required",
+    },
     // TODO: move to smtp sub-object
     smtpSender: "noreply@test.test",
     smtpHost: "localhost",
