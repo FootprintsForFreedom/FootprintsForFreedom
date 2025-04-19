@@ -15,14 +15,27 @@ const userStore = inject(userStoreKey)!
     </template>
 
     <template v-else-if="userStore.loggedIn && userStore.user!.name">
-      <div>
-        <h2>Your Profile</h2>
-        <p><strong>Username:</strong> {{ userStore.user?.name }}</p>
-        <p><strong>Email:</strong> {{ userStore.user?.email }}</p>
-        <UButton @click="userStore.signOut()">
-          Sign out
-        </UButton>
-      </div>
+      <UContainer>
+        <PageHeader title="Profile" />
+        <UPageCard>
+          <div class="flex items-center md:flex-row md:justify-start md:space-x-4 md:space-y-0 space-y-4 flex-col text-center md:text-start">
+            <UAvatar
+              :src="userStore.user!.image ?? undefined"
+              :alt="userStore.user!.name"
+              size="3xl"
+              class="w-24 h-24"
+            />
+            <div class="">
+              <h2 class="text-2xl font-bold">
+                {{ userStore.user!.name }}
+              </h2>
+              <p class="text-muted">
+                {{ userStore.user!.email }}
+              </p>
+            </div>
+          </div>
+        </UPageCard>
+      </UContainer>
     </template>
   </div>
 </template>
