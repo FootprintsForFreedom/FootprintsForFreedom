@@ -38,7 +38,7 @@ export const useUserStore = defineStore("user", () => {
     await navigateTo("/login")
   }
 
-  async function updateUser(data: Partial<User>) {
+  async function updateUser(data: Partial<Omit<User, "email">>) {
     console.log("Updating user:", data)
     await $auth.updateUser(data)
     await fetchUser()

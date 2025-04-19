@@ -25,13 +25,23 @@ const userStore = inject(userStoreKey)!
               size="3xl"
               class="w-24 h-24"
             />
-            <div class="">
-              <h2 class="text-2xl font-bold">
+            <div class="w-full">
+              <h2 class="text-2xl font-bold w-full">
                 {{ userStore.user!.name }}
               </h2>
               <p class="text-muted">
                 {{ userStore.user!.email }}
               </p>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <UserUpdateModal />
+              <UButton
+                label="Delete Account"
+                variant="subtle"
+                color="error"
+                block
+              />
             </div>
           </div>
         </UPageCard>
