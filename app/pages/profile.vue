@@ -1,29 +1,20 @@
 <script lang="ts" setup>
-const userStore = inject(userStoreKey)!
-const router = useRouter()
+import { inject } from "vue"
 
 definePageMeta({
-  middleware: "auth",
+  requiresAuth: true,
 })
 
-watchEffect(() => {
-  if (!userStore.loading && !userStore.loggedIn) {
-    router.replace("/login")
-  }
-})
+const userStore = inject(userStoreKey)!
 </script>
 
 <template>
   <div>
-    <template v-if="userStore.loading">
-      <!-- Optionally show a loading spinner here -->
+    <template v-if="userStore.loggedIn && !userStore.user!.name">
+      <UserSetInitialUsernameForm />
     </template>
-    <template v-else-if="!userStore.loggedIn">
-      <div>
-        <h2>Please log in</h2>
-      </div>
-    </template>
-    <template v-else>
+
+    <template v-else-if="userStore.loggedIn && userStore.user!.name">
       <div>
         <h2>Your Profile</h2>
         <p><strong>Username:</strong> {{ userStore.user?.name }}</p>

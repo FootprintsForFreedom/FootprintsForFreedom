@@ -8,6 +8,7 @@ definePageMeta({
 })
 
 const { $auth } = useNuxtApp()
+const route = useRoute()
 
 const loading = ref(false)
 const emailSent = ref(false)
@@ -33,12 +34,12 @@ const schema = v.object({
 type Schema = v.InferOutput<typeof schema>
 
 async function onSubmit(payload: FormSubmitEvent<Schema>) {
-  console.log("Submitted", payload.data)
   loading.value = true
+  const callbackURL = route.query["redirect"] as string | undefined ?? "/profile"
 
   await $auth.signIn.magicLink({
     email: payload.data.email,
-    callbackURL: "/profile",
+    callbackURL,
   })
   loading.value = false
   emailSent.value = true
