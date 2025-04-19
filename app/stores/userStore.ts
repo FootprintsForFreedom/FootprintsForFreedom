@@ -1,51 +1,44 @@
+import type { User } from "better-auth"
 import { defineStore } from "pinia"
+import type { InjectionKey } from "vue"
+
+export const userStoreKey: InjectionKey<ReturnType<typeof useUserStore>> = Symbol("userStore")
 
 export const useUserStore = defineStore("user", () => {
-  // const user = ref<UserDetail | null>(null)
-  // const edgedbIdentity = useEdgeDbIdentity()
+  const user = ref<User | null>(null)
+  const loading = ref(false)
 
   async function loadUser() {
-  //   if (!import.meta.server) {
-  //     const loadedUser = await $fetch("/api/users/me")
-  //     user.value = loadedUser
-  //     return
-  //   } else if (edgedbIdentity.isLoggedIn.value) {
-  //     const userId = edgedbIdentity.identity.value.id
-  //     const loadedUser = await $fetch<GetUserReturns>(`/api/users/${userId}`)
-  //     if (loadedUser) {
-  //       user.value = { ...loadedUser, email: "" }
-  //     } else {
-  //       user.value = null
-  //     }
-  //   }
+    loading.value = true
+    const { $auth } = useNuxtApp()
+    try {
+      if (!user.value) {
+        const { data: session, error } = await $auth.useSession(useFetch)
+        if (error.value) {
+          console.error("Error loading user session:", error.value)
+          user.value = null
+          return
+        }
+        user.value = session.value?.user || null
+      }
+    } finally {
+      loading.value = false
+    }
   }
 
-  // async function logout() {
-  //   await edgedbIdentity.logout("/")
-  //   clearUser()
-  // }
+  const loggedIn = computed(() => !!user.value)
 
-  // function setUser(newUser: UserDetail) {
-  //   user.value = newUser
-  // }
-
-  // function clearUser() {
-  //   user.value = null
-  // }
-
-  // const isLoggedIn = edgedbIdentity.isLoggedIn
-  // const isAdmin = computed(() => user.value?.role === "Admin")
-  // const isModerator = computed(() => user.value?.role === "Moderator")
+  async function signOut() {
+    const { $auth } = useNuxtApp()
+    await $auth.signOut()
+    user.value = null
+  }
 
   return {
-  //   user,
-  //   edgedbIdentity,
+    user,
     loadUser,
-  //   logout,
-  //   setUser,
-  //   clearUser,
-  //   isLoggedIn,
-  //   isAdmin,
-  //   isModerator,
+    loggedIn,
+    signOut,
+    loading,
   }
 })
