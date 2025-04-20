@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { defineProps, defineEmits } from "vue"
-import * as v from "valibot"
 import type { FormSubmitEvent } from "@nuxt/ui"
+import { updateUserSchema } from "#shared/schemas/User"
 
 const props = defineProps({
   open: { type: Boolean, required: true },
@@ -11,13 +11,6 @@ const props = defineProps({
 })
 
 const emit = defineEmits(["update:open", "submit", "cancel"])
-
-const updateUserSchema = v.object({
-  username: v.pipe(v.string("Invalid name"), v.minLength(3, "Name must be at least 3 characters long")),
-  email: v.pipe(v.string("Invalid email"), v.email("Invalid email")),
-})
-
-type UpdateUserSchema = v.InferOutput<typeof updateUserSchema>
 
 const formState = reactive({
   username: props.username,

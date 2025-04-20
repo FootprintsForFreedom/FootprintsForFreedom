@@ -7,6 +7,10 @@ export default defineNuxtConfig({
     "@nuxtjs/mdc",
   ],
 
+  imports: {
+    dirs: ["shared/schemas/*"],
+  },
+
   devtools: {
     enabled: true,
   },
@@ -48,6 +52,9 @@ export default defineNuxtConfig({
   compatibilityDate: "2024-07-11",
 
   nitro: {
+    imports: {
+      dirs: ["shared/schemas/*"],
+    },
     experimental: {
       tasks: true,
     },

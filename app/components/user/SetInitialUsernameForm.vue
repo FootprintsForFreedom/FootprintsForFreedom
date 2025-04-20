@@ -1,21 +1,15 @@
 <script lang="ts" setup>
-import * as v from "valibot"
 import type { FormSubmitEvent } from "@nuxt/ui"
+import { userNameSchema } from "#shared/schemas/User"
 
 const userStore = inject(userStoreKey)!
-
-const usernameSchema = v.object({
-  username: v.pipe(v.string("Invalid username"), v.minLength(3, "Username must be at least 3 characters long")),
-})
-
-type UsernameSchema = v.InferOutput<typeof usernameSchema>
 
 const state = reactive({
   loading: false,
   username: "",
 })
 
-async function onSubmit(event: FormSubmitEvent<UsernameSchema>) {
+async function onSubmit(event: FormSubmitEvent<UserNameSchema>) {
   state.loading = true
   try {
     await userStore.updateUser({ name: event.data.username })
@@ -33,7 +27,7 @@ async function onSubmit(event: FormSubmitEvent<UsernameSchema>) {
       description="Please set a username to get started."
     >
       <UForm
-        :schema="usernameSchema"
+        :schema="userNameSchema"
         :state="state"
         class="space-y-4"
         @submit="onSubmit"

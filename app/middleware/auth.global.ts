@@ -6,7 +6,6 @@ declare module "vue-router" {
 
 export default defineNuxtRouteMiddleware(async (to, _from) => {
   const userStore = useUserStore()
-  console.log(to.fullPath)
 
   await userStore.loadUser()
   // Redirect to profile if user is logged in and trying to access login

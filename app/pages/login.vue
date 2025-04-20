@@ -1,7 +1,6 @@
 <script lang="ts" setup>
-import * as v from "valibot"
 import type { FormSubmitEvent } from "@nuxt/ui"
-import type { Schema } from "effect"
+import { userEmailSchema } from "#shared/schemas/User"
 
 definePageMeta({
   layout: "auth",
@@ -27,13 +26,7 @@ const submitButton = computed(() => ({
   loading: loading.value,
 }))
 
-const schema = v.object({
-  email: v.pipe(v.string("Invalid email"), v.email("Invalid email")),
-})
-
-type Schema = v.InferOutput<typeof schema>
-
-async function onSubmit(payload: FormSubmitEvent<Schema>) {
+async function onSubmit(payload: FormSubmitEvent<UserEmailSchema>) {
   loading.value = true
   const callbackURL = route.query["redirect"] as string | undefined ?? "/profile"
 
@@ -60,7 +53,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
       <UAuthForm
         v-if="!emailSent"
         key="login"
-        :schema="schema"
+        :schema="userEmailSchema"
         title="Login"
         description="Enter your email to login or sign up."
         icon="i-lucide-user"
