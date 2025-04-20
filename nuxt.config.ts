@@ -7,6 +7,10 @@ export default defineNuxtConfig({
     "@nuxtjs/mdc",
   ],
 
+  imports: {
+    dirs: ["shared/schemas/*"],
+  },
+
   devtools: {
     enabled: true,
   },
@@ -21,6 +25,12 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     databaseUrl: "postgres://postgres:postgres@localhost:5432/postgres",
+    passkey: {
+      rpID: "localhost",
+      rpName: "Footprints4Freedom",
+      origin: "http://localhost:3000",
+      userVerification: "required",
+    },
     // TODO: move to smtp sub-object
     smtpSender: "noreply@test.test",
     smtpHost: "localhost",
@@ -42,6 +52,9 @@ export default defineNuxtConfig({
   compatibilityDate: "2024-07-11",
 
   nitro: {
+    imports: {
+      dirs: ["shared/schemas/*"],
+    },
     experimental: {
       tasks: true,
     },

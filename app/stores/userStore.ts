@@ -1,51 +1,75 @@
-import { defineStore } from "pinia"
+import type { User } from "better-auth"
+
+export const userStoreKey: InjectionKey<ReturnType<typeof useUserStore>> = Symbol("userStore")
 
 export const useUserStore = defineStore("user", () => {
-  // const user = ref<UserDetail | null>(null)
-  // const edgedbIdentity = useEdgeDbIdentity()
+  const { $auth } = useNuxtApp()
+  const user = ref<User | null>(null)
+  const loading = ref(false)
 
-  async function loadUser() {
-  //   if (!import.meta.server) {
-  //     const loadedUser = await $fetch("/api/users/me")
-  //     user.value = loadedUser
-  //     return
-  //   } else if (edgedbIdentity.isLoggedIn.value) {
-  //     const userId = edgedbIdentity.identity.value.id
-  //     const loadedUser = await $fetch<GetUserReturns>(`/api/users/${userId}`)
-  //     if (loadedUser) {
-  //       user.value = { ...loadedUser, email: "" }
-  //     } else {
-  //       user.value = null
-  //     }
-  //   }
+  async function fetchUser() {
+    const { data: session, error } = await $auth.useSession(useFetch)
+    if (error.value) {
+      console.error("Error loading user session:", error.value)
+      user.value = null
+      return
+    }
+    user.value = session.value?.user || null
   }
 
-  // async function logout() {
-  //   await edgedbIdentity.logout("/")
-  //   clearUser()
-  // }
+  async function loadUser() {
+    loading.value = true
+    try {
+      if (!user.value) {
+        await fetchUser()
+      }
+    } finally {
+      loading.value = false
+    }
+  }
 
-  // function setUser(newUser: UserDetail) {
-  //   user.value = newUser
-  // }
+  const loggedIn = computed(() => !!user.value)
 
-  // function clearUser() {
-  //   user.value = null
-  // }
+  async function signOut() {
+    await $auth.signOut()
+    user.value = null
+    await navigateTo("/login")
+  }
 
-  // const isLoggedIn = edgedbIdentity.isLoggedIn
-  // const isAdmin = computed(() => user.value?.role === "Admin")
-  // const isModerator = computed(() => user.value?.role === "Moderator")
+  async function updateUser({ email, ...dataWithoutEmail }: Partial<User>) {
+    if (Object.keys(dataWithoutEmail).length > 0) {
+      const res = await $auth.updateUser(dataWithoutEmail)
+      if (res.error) {
+        throw new Error(res.error.message)
+      }
+    }
+    if (email && email !== user.value?.email) {
+      const res = await $auth.changeEmail({
+        newEmail: email,
+        callbackURL: "/profile",
+      })
+      if (res.error) {
+        if (res.error.code === "COULDNT_UPDATE_YOUR_EMAIL") {
+          throw new EmailAlreadyExistsError()
+        } else {
+          throw new Error(res.error.message)
+        }
+      }
+    }
+    await fetchUser()
+  }
+
+  async function deleteUser() {
+    return await $auth.deleteUser({ callbackURL: "/login" })
+  }
 
   return {
-  //   user,
-  //   edgedbIdentity,
+    user,
     loadUser,
-  //   logout,
-  //   setUser,
-  //   clearUser,
-  //   isLoggedIn,
-  //   isAdmin,
-  //   isModerator,
+    loggedIn,
+    signOut,
+    loading,
+    updateUser,
+    deleteUser,
   }
 })

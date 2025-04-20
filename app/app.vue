@@ -21,11 +21,13 @@ useSeoMeta({
   twitterCard: "summary_large_image",
 })
 
-const user = useUserStore()
+const userStore = useUserStore()
 
 await callOnce(async () => {
-  await user.loadUser()
+  await userStore.loadUser()
 })
+
+provide(userStoreKey, userStore)
 </script>
 
 <template>
