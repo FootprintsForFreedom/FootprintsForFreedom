@@ -1,6 +1,4 @@
 import type { User } from "better-auth"
-import { defineStore } from "pinia"
-import type { InjectionKey } from "vue"
 
 export const userStoreKey: InjectionKey<ReturnType<typeof useUserStore>> = Symbol("userStore")
 
@@ -44,6 +42,10 @@ export const useUserStore = defineStore("user", () => {
     await fetchUser()
   }
 
+  async function deleteUser() {
+    return await $auth.deleteUser({ callbackURL: "/login" })
+  }
+
   return {
     user,
     loadUser,
@@ -51,5 +53,6 @@ export const useUserStore = defineStore("user", () => {
     signOut,
     loading,
     updateUser,
+    deleteUser,
   }
 })

@@ -1,11 +1,29 @@
 <script lang="ts" setup>
-import { inject } from "vue"
-
 definePageMeta({
   requiresAuth: true,
 })
 
 const userStore = inject(userStoreKey)!
+const toast = useToast()
+
+const showDeleteModal = ref(false)
+
+async function onDeleteConfirm() {
+  const res = await userStore.deleteUser()
+  if (res.data?.success) {
+    toast.add({
+      title: "Confirmation email sent",
+      description: "Click the link in the email to confirm your account deletion.",
+      color: "success",
+    })
+  } else {
+    toast.add({
+      title: "Error deleting account",
+      description: "Failed to send confirmation email. Please try again later.",
+      color: "error",
+    })
+  }
+}
 </script>
 
 <template>
@@ -41,6 +59,12 @@ const userStore = inject(userStoreKey)!
                 variant="subtle"
                 color="error"
                 block
+                @click="showDeleteModal = true"
+              />
+              <UserConfirmDeleteModal
+                :open="showDeleteModal"
+                @update:open="showDeleteModal = $event"
+                @confirm="onDeleteConfirm"
               />
             </div>
           </div>

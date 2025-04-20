@@ -15,6 +15,12 @@ export const auth = betterAuth({
     }),
   ],
   user: {
+    deleteUser: {
+      enabled: true,
+      sendDeleteAccountVerification: async ({ user, token, url }, _request) => {
+        console.log(`Sending delete account verification to ${user.email} with token ${token} and url ${url}`)
+      },
+    },
     additionalFields: {
       role: {
         type: "string",
