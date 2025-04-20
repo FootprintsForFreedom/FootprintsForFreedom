@@ -5,21 +5,21 @@ const dropdownItems = computed(() => [
   [
     {
       label: "Profile",
-      icon: "i-lucide-user",
+      icon: "lucide:user",
       to: "/profile",
     },
     {
       label: "Settings",
-      icon: "i-lucide-settings",
+      icon: "lucide:settings",
       to: "/settings",
     },
   ],
   [
     {
       label: "Logout",
-      icon: "i-lucide-log-out",
+      icon: "lucide:log-out",
       onSelect: () => {
-        userStore.logout()
+        userStore.signOut()
       },
     },
   ],
@@ -29,7 +29,7 @@ const dropdownItems = computed(() => [
 <template>
   <ColorModeSelectButton />
   <UDropdownMenu
-    v-if="user.isLoggedIn"
+    v-if="userStore.loggedIn"
     :items="dropdownItems"
     :content="{
       align: 'end',
@@ -41,7 +41,7 @@ const dropdownItems = computed(() => [
       variant="link"
       aria-label="User"
       :avatar="{
-        alt: user.user?.name,
+        alt: userStore.user?.name,
         size: 'lg',
       }"
     />
@@ -50,7 +50,7 @@ const dropdownItems = computed(() => [
     v-else
     color="primary"
     to="/login"
-    icon="i-lucide-log-in"
+    icon="lucide:log-in"
     aria-label="Login"
   >
     Login
