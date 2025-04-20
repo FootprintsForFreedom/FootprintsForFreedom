@@ -7,6 +7,36 @@ const userStore = inject(userStoreKey)!
 const toast = useToast()
 
 const showDeleteModal = ref(false)
+const showUpdateModal = ref(false)
+const updateLoading = ref(false)
+
+async function onUpdateSubmit({ username, email }: { username: string, email: string }) {
+  updateLoading.value = true
+  try {
+    await userStore.updateUser({ name: username, email })
+    toast.add({
+      title: "Profile updated",
+      description: "Your profile information was updated.",
+      color: "success",
+    })
+  } catch (error) {
+    if (error instanceof EmailAlreadyExistsError) {
+      toast.add({
+        title: "Email already exists",
+        description: "The email address is already in use.",
+        color: "error",
+      })
+    } else {
+      toast.add({
+        title: "Error updating profile",
+        description: "Failed to update your profile. Please try again later.",
+        color: "error",
+      })
+    }
+  } finally {
+    updateLoading.value = false
+  }
+}
 
 async function onDeleteConfirm() {
   const res = await userStore.deleteUser()
@@ -53,7 +83,20 @@ async function onDeleteConfirm() {
             </div>
 
             <div class="flex flex-col gap-2">
-              <UserUpdateModal />
+              <UButton
+                label="Change name or email"
+                variant="subtle"
+                block
+                @click="showUpdateModal = true"
+              />
+              <UserUpdateModal
+                :open="showUpdateModal"
+                :username="userStore.user?.name ?? ''"
+                :email="userStore.user?.email ?? ''"
+                :loading="updateLoading"
+                @update:open="showUpdateModal = $event"
+                @submit="onUpdateSubmit"
+              />
               <UButton
                 label="Delete Account"
                 variant="subtle"

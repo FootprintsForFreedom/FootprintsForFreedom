@@ -15,6 +15,12 @@ export const auth = betterAuth({
     }),
   ],
   user: {
+    changeEmail: {
+      enabled: true,
+      sendChangeEmailVerification: async ({ user, newEmail, url, token }, _request) => {
+        console.log(`Sending change email verification to ${user.email} or ${newEmail} with token ${token} and url ${url}`)
+      },
+    },
     deleteUser: {
       enabled: true,
       sendDeleteAccountVerification: async ({ user, token, url }, _request) => {

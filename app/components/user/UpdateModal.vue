@@ -1,8 +1,16 @@
 <script lang="ts" setup>
-import type { FormSubmitEvent } from "@nuxt/ui"
+import { defineProps, defineEmits } from "vue"
 import * as v from "valibot"
+import type { FormSubmitEvent } from "@nuxt/ui"
 
-const userStore = inject(userStoreKey)!
+const props = defineProps({
+  open: { type: Boolean, required: true },
+  username: { type: String, required: true },
+  email: { type: String, required: true },
+  loading: { type: Boolean, default: false },
+})
+
+const emit = defineEmits(["update:open", "submit", "cancel"])
 
 const updateUserSchema = v.object({
   username: v.pipe(v.string("Invalid name"), v.minLength(3, "Name must be at least 3 characters long")),
@@ -11,39 +19,44 @@ const updateUserSchema = v.object({
 
 type UpdateUserSchema = v.InferOutput<typeof updateUserSchema>
 
-const state = reactive({
-  open: false,
-  loading: false,
-  username: userStore.user?.name ?? "",
-  email: userStore.user?.email ?? "",
+const formState = reactive({
+  username: props.username,
+  email: props.email,
 })
 
-async function onSubmit(event: FormSubmitEvent<UpdateUserSchema>) {
-  state.loading = true
-  try {
-    await userStore.updateUser({ name: event.data.username })
-  } finally {
-    state.open = false
-    state.loading = false
-  }
+watch(() => [props.username, props.email], ([newUsername, newEmail]) => {
+  formState.username = newUsername ?? ""
+  formState.email = newEmail ?? ""
+})
+
+function hide() {
+  emit("update:open", false)
+}
+
+function onSubmit(event: FormSubmitEvent<UpdateUserSchema>) {
+  emit("submit", { username: event.data.username, email: event.data.email })
+  hide()
+}
+
+function onCancel() {
+  emit("cancel")
+  hide()
 }
 </script>
 
 <template>
   <UModal
-    v-model:open="state.open"
+    :open="open"
     title="Update your account"
     description="Change your username or email"
+    :close-on-esc="true"
+    :close-on-backdrop="true"
+    @update:open="emit('update:open', $event)"
   >
-    <UButton
-      label="Change name or email"
-      variant="subtle"
-      block
-    />
     <template #body>
       <UForm
         :schema="updateUserSchema"
-        :state="state"
+        :state="formState"
         class="space-y-4"
         @submit="onSubmit"
       >
@@ -52,21 +65,19 @@ async function onSubmit(event: FormSubmitEvent<UpdateUserSchema>) {
           name="username"
         >
           <UInput
-            v-model="state.username"
+            v-model="formState.username"
             class="w-full"
           />
         </UFormField>
-
         <UFormField
           label="Email"
           name="email"
         >
           <UInput
-            v-model="state.email"
+            v-model="formState.email"
             class="w-full"
           />
         </UFormField>
-
         <UAlert
           color="neutral"
           variant="subtle"
@@ -74,13 +85,21 @@ async function onSubmit(event: FormSubmitEvent<UpdateUserSchema>) {
           title="E-Mail Change"
           description="Your email will be changed after you verify the new email address."
         />
-
-        <UButton
-          type="submit"
-          :loading="state.loading"
-        >
-          Update
-        </UButton>
+        <div class="flex gap-2 justify-end">
+          <UButton
+            label="Cancel"
+            variant="subtle"
+            color="neutral"
+            type="button"
+            @click="onCancel"
+          />
+          <UButton
+            type="submit"
+            :loading="loading"
+          >
+            Update
+          </UButton>
+        </div>
       </UForm>
     </template>
   </UModal>

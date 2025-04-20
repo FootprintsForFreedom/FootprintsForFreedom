@@ -30,6 +30,9 @@ function onCancel() {
     description="Are you sure you want to delete your account? This action cannot be undone. To confirm you will need to click the link in the confirmation email."
     :close-on-esc="true"
     :close-on-backdrop="true"
+    :ui="{
+      footer: 'justify-end',
+    }"
     @update:open="emit('update:open', $event)"
   >
     <template #footer>

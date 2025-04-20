@@ -36,9 +36,26 @@ export const useUserStore = defineStore("user", () => {
     await navigateTo("/login")
   }
 
-  async function updateUser(data: Partial<Omit<User, "email">>) {
-    console.log("Updating user:", data)
-    await $auth.updateUser(data)
+  async function updateUser({ email, ...dataWithoutEmail }: Partial<User>) {
+    if (Object.keys(dataWithoutEmail).length > 0) {
+      const res = await $auth.updateUser(dataWithoutEmail)
+      if (res.error) {
+        throw new Error(res.error.message)
+      }
+    }
+    if (email && email !== user.value?.email) {
+      const res = await $auth.changeEmail({
+        newEmail: email,
+        callbackURL: "/profile",
+      })
+      if (res.error) {
+        if (res.error.code === "COULDNT_UPDATE_YOUR_EMAIL") {
+          throw new EmailAlreadyExistsError()
+        } else {
+          throw new Error(res.error.message)
+        }
+      }
+    }
     await fetchUser()
   }
 
