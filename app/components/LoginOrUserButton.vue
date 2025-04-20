@@ -1,36 +1,5 @@
 <script lang="ts" setup>
-const user = useUserStore()
-const colorMode = useColorMode()
-
-const colorModeOptions = computed(() => [
-  {
-    id: "light",
-    label: "Light",
-    icon: "i-lucide-sun",
-    disabled: colorMode.preference === "light",
-    onSelect: () => {
-      colorMode.preference = "light"
-    },
-  },
-  {
-    id: "dark",
-    label: "Dark",
-    icon: "i-lucide-moon",
-    disabled: colorMode.preference === "dark",
-    onSelect: () => {
-      colorMode.preference = "dark"
-    },
-  },
-  {
-    id: "auto",
-    label: "System",
-    icon: "i-lucide-monitor",
-    disabled: colorMode.preference === "system",
-    onSelect: () => {
-      colorMode.preference = "system"
-    },
-  },
-])
+const userStore = inject(userStoreKey)!
 
 const dropdownItems = computed(() => [
   [
@@ -50,7 +19,7 @@ const dropdownItems = computed(() => [
       label: "Logout",
       icon: "i-lucide-log-out",
       onSelect: () => {
-        user.logout()
+        userStore.logout()
       },
     },
   ],
@@ -58,22 +27,7 @@ const dropdownItems = computed(() => [
 </script>
 
 <template>
-  <UDropdownMenu
-    :items="colorModeOptions"
-    :content="{
-      align: 'center',
-      side: 'bottom',
-      sideOffset: 8,
-    }"
-  >
-    <UButton
-      color="neutral"
-      variant="link"
-      icon="i-lucide-sun"
-      aria-label="Login"
-    />
-  </UDropdownMenu>
-
+  <ColorModeSelectButton />
   <UDropdownMenu
     v-if="user.isLoggedIn"
     :items="dropdownItems"
